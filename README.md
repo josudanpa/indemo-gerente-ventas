@@ -9,16 +9,17 @@ Tablero estático (un solo `index.html`, sin build) con los indicadores base que
 - **Deploy:** `Dockerfile` (nginx:alpine), puerto 80. En EasyPanel: app desde este repo, rama `main`.
 - `flujo-n8n-gerente-ventas-indemo.json`: respaldo del flujo **sin el token de Kommo** (reemplazar `TOKEN_DE_KOMMO` en el nodo `Config4` si se importa).
 
-## Dos pestañas
-La IA (Valentina) solo atiende **redes sociales** (Instagram y Facebook). Por eso el tablero se divide:
+## Dos secciones, cargadas juntas (sin botón de cambio)
+La IA (Valentina) solo atiende **redes sociales** (Instagram y Facebook). Por eso el tablero tiene dos secciones, una debajo de la otra, que se cargan al mismo tiempo con un solo «Generar reporte completo»:
 
-| Pestaña | Embudos | Qué mide |
+| Sección | Embudos | Qué mide |
 |---|---|---|
 | **Redes sociales (con IA)** | LEADS REDES SOCIALES | Lo que la IA recibe y **delega** a las asesoras (primera vez que un lead llega a CALIFICADO), y qué tan rápido lo atienden. A la IA no se la audita: solo se muestra cuánto recibió. |
 | **CDMX y MTY (asesoras)** | LEADS CDMX y LEADS MTY | Todo corresponde a las asesoras: leads que nacen en esos embudos (sin los que pasó la IA), tiempo de respuesta, avance, vivos. |
 
-Las dos pestañas muestran los mismos bloques: leads, desempeño, atención/tiempo de respuesta, inscritos, canales, leads vivos, oportunidades calientes y actividad diaria.
-**Inscritos** y su comparativo cuentan siempre todos los embudos de Indemo (un lead que la IA delega se inscribe ya en CDMX o MTY).
+Cada sección trae sus propios bloques: leads, desempeño y atención / tiempo de respuesta (con la lista de leads sin atender y su historial).
+Debajo vienen los bloques compartidos de todos los embudos: inscritos con comparativo, canales (nuevos de CDMX/MTY más delegados por la IA), leads vivos por etapa, oportunidades calientes (agrupadas por nombre de etapa: Calificado en redes; cita en campus a inicio de proceso de pago en CDMX y MTY) y actividad diaria.
+Si en los filtros se eligen embudos, cada sección solo aparece si incluye alguno de los suyos. **Inscritos** y su comparativo cuentan todos los embudos (un lead que la IA delega se inscribe ya en CDMX o MTY).
 
 ## Cómo se define cada cosa
 | Qué | Dónde |
