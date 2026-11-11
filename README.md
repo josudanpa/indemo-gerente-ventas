@@ -1,7 +1,7 @@
 # Gerente de ventas · INDEMO
 
 Tablero estático (un solo `index.html`, sin build) con los indicadores base que pidió Manu para Indemo
-(leads recibidos, leads vivos, tiempos de respuesta y cumplimiento de la atención), con la misma estructura del gerente de ventas de Gestalt.
+(leads recibidos, leads calificados, tiempos de respuesta y cumplimiento de la atención), con la misma estructura del gerente de ventas de Gestalt.
 
 - **Datos:** Kommo `graceindemocommx` (cuenta 36402207), a través del flujo n8n
   `aristoteles - indemo (gerente de ventas: redes con IA + asesoras CDMX/MTY)` (id `DIGzV82ogXDLYMlC`, instancia `digital-crew-n8n.xrzfaj.easypanel.host`).
@@ -10,7 +10,7 @@ Tablero estático (un solo `index.html`, sin build) con los indicadores base que
 - `flujo-n8n-gerente-ventas-indemo.json`: respaldo del flujo **sin el token de Kommo** (reemplazar `TOKEN_DE_KOMMO` en el nodo `Config4` si se importa).
 
 ## Dos secciones, cargadas juntas (sin botón de cambio)
-La IA (Valentina) solo atiende **redes sociales** (Instagram y Facebook). Por eso el tablero tiene dos secciones, una debajo de la otra, que se cargan al mismo tiempo con un solo «Generar reporte completo»:
+La IA (Valentina) solo atiende **redes sociales** (Instagram y Facebook). Por eso el tablero tiene dos secciones, una debajo de la otra, que se cargan al mismo tiempo con un solo «Generar reporte completo». Primero CDMX y MTY (asesoras); todo lo de la IA va al final de la página:
 
 | Sección | Embudos | Qué mide |
 |---|---|---|
@@ -18,7 +18,7 @@ La IA (Valentina) solo atiende **redes sociales** (Instagram y Facebook). Por es
 | **CDMX y MTY (asesoras)** | LEADS CDMX y LEADS MTY | Todo corresponde a las asesoras: leads que nacen en esos embudos (sin los que pasó la IA), tiempo de respuesta, avance, vivos. |
 
 Cada sección trae sus propios bloques: leads, desempeño y atención / tiempo de respuesta (con la lista de leads sin atender y su historial).
-Debajo vienen los bloques compartidos de todos los embudos: inscritos con comparativo, canales (nuevos de CDMX/MTY más delegados por la IA), leads vivos por etapa, oportunidades calientes (agrupadas por nombre de etapa: Calificado en redes; cita en campus a inicio de proceso de pago en CDMX y MTY) y actividad diaria.
+Entre las dos secciones van los bloques compartidos de todos los embudos: inscritos con comparativo, canales (nuevos de CDMX/MTY más delegados por la IA), el listado de **leads calificados** (CALIFICADO en redes; de cita en campus a inicio de proceso de pago en CDMX y MTY, con exportar a CSV) y la actividad diaria. Sin tablas de «oportunidades calientes» ni de «leads vivos» y sin «JSON crudo» (se quitaron el 11-nov a pedido de Josué).
 Si en los filtros se eligen embudos, cada sección solo aparece si incluye alguno de los suyos. **Inscritos** y su comparativo cuentan todos los embudos (un lead que la IA delega se inscribe ya en CDMX o MTY).
 
 ## Cómo se define cada cosa

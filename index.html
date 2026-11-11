@@ -365,7 +365,7 @@
     </div>
 
     <div style="margin-top:18px;">
-      <label class="field-label">Oportunidades calientes: ¿cuáles incluyo?</label>
+      <label class="field-label">Leads calificados: ¿cuáles incluyo?</label>
       <div class="toggle-group" id="calificadosToggle">
         <label class="active" data-value="actual"><span>Todas las que hay ahora</span></label>
         <label data-value="periodo"><span>Solo las creadas en ese periodo</span></label>
@@ -414,7 +414,6 @@
       <p class="help" id="tDesempenoAyuda">De los leads que llegaron a los asesores en el periodo: cuántos llegaron a cita y a documentos, cuántos se inscribieron y cómo se perdieron los que se perdieron. Es la foto de dónde están hoy esos leads.</p>
       <div id="resultsStats"></div>
       <div id="resultsTable"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJson"></pre></details>
     </div>
 
     <!-- Atención a lo que delega la IA -->
@@ -463,41 +462,18 @@
       <p class="help" id="tCanalesAyuda">De qué canal vienen los leads que llegaron a los asesores en el periodo, cuántos llegaron a cita y cuántas inscripciones se registraron. El canal sale de las <b>etiquetas</b> del lead (Facebook/Instagram, Google, sitio web, referidos, eventos y escuelas, llamada o visita directa, base propia); cada lead cuenta en el primer canal que coincida. Los que no traen etiqueta de canal salen aparte: mientras más se etiquete, más exacta esta tabla.</p>
       <div id="canalesStats"></div>
       <div id="canalesTable"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonCanales"></pre></details>
     </div>
 
-    <!-- Leads vivos en el embudo (indicador de Manu) -->
-    <div class="panel">
-      <div class="panel-head">
-        <div class="panel-icon" id="iconVivos"></div>
-        <h2>Leads vivos en el embudo</h2>
-      </div>
-      <p class="help" id="tVivosAyuda"></p>
-      <div id="vivosStats"></div>
-      <div id="vivosTable"></div>
-    </div>
-
-    <!-- Tablero 4 · Oportunidades calientes -->
+    <!-- Leads calificados (listado) -->
     <div class="calif-row" style="flex-direction:column; flex-wrap:nowrap;">
       <div class="panel" style="flex:none; width:100%;">
         <div class="panel-head">
-          <div class="panel-icon" id="iconCalificados"></div>
-          <h2>Oportunidades calientes</h2>
-          <span class="period-badge" id="crosstabPeriodBadge"></span>
-        </div>
-        <p class="help" id="tCalientesAyuda">Quién está ahora mismo en una etapa caliente de cada embudo: Prospecto Hot, Citas Hot, Documentos Hot, Evaluación o Cierre Hot.</p>
-        <div id="crosstabStats"></div>
-        <div id="crosstabTable"></div>
-        <div class="help" id="crosstabExcluidos" style="margin-top:10px;"></div>
-        <details><summary>JSON crudo</summary><pre id="rawJsonCrosstab"></pre></details>
-      </div>
-      <div class="panel" style="flex:none; width:100%;">
-        <div class="panel-head">
           <div class="panel-icon" id="iconLeadsCalifLista"></div>
-          <h2 id="calificadosListaTitulo">Leads calientes</h2>
+          <h2 id="calificadosListaTitulo">Leads calificados</h2>
+          <span class="period-badge" id="crosstabPeriodBadge"></span>
           <button type="button" id="btnExportarCalificados" class="export-btn"><span id="iconExportar"></span><span>Exportar</span></button>
         </div>
-        <p class="help">Listado de leads en etapas calientes, de la etapa más avanzada a la menos avanzada y, dentro de cada una, de los que llevan más tiempo sin moverse a los más recientes.</p>
+        <p class="help">Leads calificados: los que están en CALIFICADO en redes sociales y, en CDMX y MTY, de cita en campus a inicio de proceso de pago. De la etapa más avanzada a la menos avanzada y, dentro de cada una, de los que llevan más tiempo sin moverse a los más recientes.</p>
         <div class="embudo-filter-row">
           <label for="calificadosEmbudoFiltro">Embudo</label>
           <select id="calificadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
@@ -519,7 +495,6 @@
       <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Actividades por día</h3>
       <div id="actividadDiaTable"></div>
       <div class="help" id="actividadNota" style="margin-top:10px;"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonActividad"></pre></details>
     </div>
   </div>
 
@@ -582,7 +557,6 @@ paintIcon('iconActividad', 'zap', 'var(--ink-soft)');
 paintIcon('iconTiempos', 'clock', 'var(--ink-soft)');
 paintIcon('iconLeadsCalifLista', 'users', 'var(--c-positive)');
 paintIcon('iconExportar', 'download', 'var(--ink)');
-paintIcon('iconVivos', 'users', 'var(--ink-soft)');
 
 /* ============================== DATOS ============================== */
 const WEBHOOK_URL = "https://digital-crew-n8n.xrzfaj.easypanel.host/webhook/GERENTE-VENTAS-INDEMO";
@@ -648,7 +622,7 @@ const MODOS = {
   asesoras: {
     secTitulo: 'CDMX y MTY · asesoras',
     pipelines: [PIPE.cdmx, PIPE.mty],
-    ayudaModo: 'CDMX y MTY: aquí no interviene la IA, todo corresponde a las asesoras. Se cuentan los leads que nacieron en esos embudos; los que pasaron por redes sociales (IA) se ven en la sección de arriba.',
+    ayudaModo: 'CDMX y MTY: aquí no interviene la IA, todo corresponde a las asesoras. Se cuentan los leads que nacieron en esos embudos; los que pasaron por redes sociales (IA) se ven al final de la página.',
     filtroAyuda: '<b style="color:var(--ink-soft)">CDMX y MTY:</b> cuentan los leads que nacieron en esos embudos en ese rango (sin los que pasó la IA). &nbsp; <b style="color:var(--ink-soft)">Inscritos</b> cuenta las inscripciones registradas en ese rango, sin importar cuándo nació el lead ni en qué embudo.',
     leadsTitulo: 'Leads nuevos de las asesoras',
     leadsAyuda: 'Leads que nacieron en CDMX y MTY en el periodo (formularios, WhatsApp, landing, llamadas, etc.). Todo lo atienden las asesoras. Se ven por asesora responsable y por embudo; las dos sumas tienen que coincidir.',
@@ -679,7 +653,7 @@ const MODOS = {
 // escribe en el suyo. usarModo() apunta `els` y MODO_ACTUAL al bloque que se va a pintar (el render es síncrono).
 let MODO_ACTUAL = 'ia';
 let catalogoPipelines = [];
-const CLAVES_BLOQUE = ['resultsStats', 'resultsTable', 'rawJson', 'leadsPeriodoStats', 'leadsPorAsesorTable', 'leadsPorEmbudoTable', 'iaResumen', 'atencionStats', 'atencionTable', 'atencionSinAtender', 'atencionNota'];
+const CLAVES_BLOQUE = ['resultsStats', 'resultsTable', 'leadsPeriodoStats', 'leadsPorAsesorTable', 'leadsPorEmbudoTable', 'iaResumen', 'atencionStats', 'atencionTable', 'atencionSinAtender', 'atencionNota'];
 const elsModo = { ia: {}, asesoras: {} };
 function TXT() { return MODOS[MODO_ACTUAL].txt; }
 function setHtml(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
@@ -688,7 +662,8 @@ function prepararBloques() {
   const clon = orig.cloneNode(true);
   clon.id = 'bloqueAsesoras';
   clon.querySelectorAll('[id]').forEach(n => { n.id = n.id + 'As'; });
-  orig.after(clon);
+  orig.before(clon);
+  els.resultsRow.appendChild(orig);   // todo lo de la IA va hasta el final de la pagina
   for (const k of CLAVES_BLOQUE) { elsModo.ia[k] = els[k]; elsModo.asesoras[k] = clon.querySelector('#' + els[k].id + 'As'); }
 }
 function usarModo(m) { MODO_ACTUAL = m; Object.assign(els, elsModo[m]); }
@@ -710,11 +685,9 @@ function aplicarTextosModo(modo, sfx) {
   t('tSinAtenderAyuda', m.sinAtenderAyuda);
 }
 function aplicarTextosComunes() {
-  setHtml('tFiltroAyuda', '<b style="color:var(--ink-soft)">Redes sociales (con IA):</b> cuenta los leads que la IA pasó a CALIFICADO en ese rango. &nbsp; <b style="color:var(--ink-soft)">CDMX y MTY (asesoras):</b> cuenta los leads que nacieron en esos embudos en ese rango, sin los que pasó la IA. &nbsp; <b style="color:var(--ink-soft)">Inscritos</b> cuenta las inscripciones registradas en ese rango, sin importar cuándo nació el lead ni en qué embudo.');
+  setHtml('tFiltroAyuda', '<b style="color:var(--ink-soft)">CDMX y MTY (asesoras):</b> cuenta los leads que nacieron en esos embudos en ese rango, sin los que pasó la IA. &nbsp; <b style="color:var(--ink-soft)">Redes sociales (con IA), al final:</b> cuenta los leads que la IA pasó a CALIFICADO en ese rango. &nbsp; <b style="color:var(--ink-soft)">Inscritos</b> cuenta las inscripciones registradas en ese rango, sin importar cuándo nació el lead ni en qué embudo.');
   setHtml('tCanalesAyuda', 'De qué canal vienen los leads que llegaron a las asesoras en el periodo (los nuevos de CDMX y MTY más los que delegó la IA), cuántos llegaron a cita y cuántas inscripciones se registraron (de todos los embudos). El canal sale de las <b>etiquetas</b> del lead (Meta, sitio web, WhatsApp, remarketing, eventos, alianzas, llamada o captura manual, orgánico); cada lead cuenta en el primer canal que coincida. Los que no traen etiqueta de canal salen aparte.');
-  setHtml('tCalientesAyuda', 'Quién está ahora mismo en una etapa avanzada: CALIFICADO en redes sociales (esperando a una asesora) y, en CDMX y MTY, cita en campus, asistió a visita, clase muestra, entrevista de admisión, propuesta o elección de horarios e inicio de proceso de pago.');
   setHtml('tActividadAyuda', 'Lo que cada asesora hizo en Kommo en el rango de fechas: mensajes de WhatsApp enviados, notas, tareas completadas y citas (tareas de tipo Reunión). Lo que se hace fuera de Kommo no aparece; los mensajes del bot y las automatizaciones no cuentan.');
-  setHtml('tVivosAyuda', 'Leads abiertos hoy en cada embudo, por etapa (todo lo que no está en inscrito ni perdido). Es la foto de este momento, no depende de las fechas.');
 }
 function pintarChipsEmbudos() {
   els.pipelineChecks.innerHTML = catalogoPipelines.map(p => '<label class="chip"><input type="checkbox" value="' + p.id + '" class="pipelineCheck"><span class="chip-dot"></span>' + p.name + '</label>').join('') || '<span class="help">Cargando catálogo…</span>';
@@ -736,14 +709,9 @@ const els = {
   resultsRow: document.getElementById('resultsRow'),
   resultsStats: document.getElementById('resultsStats'),
   resultsTable: document.getElementById('resultsTable'),
-  rawJson: document.getElementById('rawJson'),
   leadsPeriodoStats: document.getElementById('leadsPeriodoStats'),
   leadsPorAsesorTable: document.getElementById('leadsPorAsesorTable'),
   leadsPorEmbudoTable: document.getElementById('leadsPorEmbudoTable'),
-  crosstabStats: document.getElementById('crosstabStats'),
-  crosstabTable: document.getElementById('crosstabTable'),
-  crosstabExcluidos: document.getElementById('crosstabExcluidos'),
-  rawJsonCrosstab: document.getElementById('rawJsonCrosstab'),
   crosstabPeriodBadge: document.getElementById('crosstabPeriodBadge'),
   calificadosListaTitulo: document.getElementById('calificadosListaTitulo'),
   calificadosListaTable: document.getElementById('calificadosListaTable'),
@@ -757,12 +725,10 @@ const els = {
   inscritosComparativo: document.getElementById('inscritosComparativo'),
   canalesStats: document.getElementById('canalesStats'),
   canalesTable: document.getElementById('canalesTable'),
-  rawJsonCanales: document.getElementById('rawJsonCanales'),
   actividadStats: document.getElementById('actividadStats'),
   actividadTable: document.getElementById('actividadTable'),
   actividadDiaTable: document.getElementById('actividadDiaTable'),
   actividadNota: document.getElementById('actividadNota'),
-  rawJsonActividad: document.getElementById('rawJsonActividad'),
   iaResumen: document.getElementById('iaResumen'),
   atencionStats: document.getElementById('atencionStats'),
   atencionTable: document.getElementById('atencionTable'),
@@ -953,7 +919,7 @@ els.btnGenerar.addEventListener('click', async () => {
 
   els.btnGenerar.disabled = true;
   els.resultsRow.style.display = 'none';
-  setStatus('Generando el reporte completo (redes sociales con IA y CDMX y MTY con asesoras)… puede tardar hasta un minuto.', 'pending');
+  setStatus('Generando el reporte completo (CDMX y MTY con asesoras y redes sociales con IA)… puede tardar hasta un minuto.', 'pending');
 
   try {
     // Inscritos y su comparativo: todos los embudos (salvo que se elijan a mano), porque un lead que delega la IA se inscribe ya en CDMX o MTY
@@ -962,7 +928,7 @@ els.btnGenerar.addEventListener('click', async () => {
     const crossBody = { ...base, view: 'qualified_crosstab' };
     if (!useSnapshot) { crossBody.date_from = desde; crossBody.date_to = hasta; }
 
-    // Todo junto: las dos secciones, inscritos y oportunidades calientes (4 consultas a la vez, igual que el tablero anterior)
+    // Todo junto: las dos secciones, inscritos y el listado de leads calificados (4 consultas a la vez, igual que el tablero anterior)
     const [rIA, rAs, rClosed, rCross] = await Promise.allSettled([
       quiereIA ? callWebhook({ ...base, pipeline_ids: [PIPE.redes], view: 'advisors', modo: 'ia', date_from: desde, date_to: hasta }, 'inicial') : Promise.resolve(null),
       quiereAs ? callWebhook({ ...base, pipeline_ids: idsAsesoras.length ? idsAsesoras : [PIPE.cdmx, PIPE.mty], view: 'advisors', modo: 'asesoras', date_from: desde, date_to: hasta }, 'inicial') : Promise.resolve(null),
@@ -990,7 +956,6 @@ els.btnGenerar.addEventListener('click', async () => {
         renderLeadsPorPeriodo(p);
         renderResultados(p);
         renderAtencion(p);
-        els.rawJson.textContent = JSON.stringify(r.value, null, 2);
       } catch (err) { mostrarErrorBloque(err.message); console.error(err); }
     }
     usarModo('ia');
@@ -998,31 +963,16 @@ els.btnGenerar.addEventListener('click', async () => {
     renderGanados(closedPayload);
     renderCanales({ por_canal: mezclarCanales(Object.values(advPayloads)) }, closedPayload);
     renderCrosstab(crossPayload);
-    els.rawJsonCanales.textContent = JSON.stringify({ llegaron_a_asesoras: Object.fromEntries(Object.entries(advPayloads).map(([k, p]) => [k, p.por_canal])), inscritos_del_periodo: closedPayload.por_canal }, null, 2);
-    els.rawJsonCrosstab.textContent = JSON.stringify(rCross.value, null, 2);
     els.resultsRow.style.display = 'block';
     els.actividadStats.innerHTML = '';
     els.actividadTable.innerHTML = '<div class="empty">Cargando actividad…</div>';
     els.actividadDiaTable.innerHTML = '';
-    setHtml('vivosStats', '');
-    setHtml('vivosTable', '<div class="empty">Cargando leads vivos…</div>');
-    setStatus('Leads, desempeño, atención e inscritos listos. Cargando leads vivos, actividad y comparativos…', 'pending');
-
-    // Leads vivos en el embudo (foto de hoy; si falla, no tira el resto)
-    try {
-      const vivData = await callWebhook({ type: 'leads', view: 'live_leads', pipeline_ids: elegidos, agent_ids: agentIds, tag_ids: tagIds }, 'inicial');
-      renderVivos(extractPayload(vivData, 'por_embudo'));
-    } catch (err) {
-      setHtml('vivosStats', '');
-      setHtml('vivosTable', '<div class="empty">No se pudieron cargar los leads vivos: ' + escH(err.message) + '</div>');
-      console.error(err);
-    }
+    setStatus('Leads, desempeño, atención e inscritos listos. Cargando actividad y comparativos…', 'pending');
 
     // Actividad por asesora (si falla, no tira el resto)
     try {
       const actData = await callWebhook({ type: 'leads', view: 'activities', date_from: desde, date_to: hasta, agent_ids: agentIds }, 'inicial');
       renderActividad(extractPayload(actData, 'por_asesor'));
-      els.rawJsonActividad.textContent = JSON.stringify(actData, null, 2);
     } catch (err) {
       els.actividadStats.innerHTML = '';
       els.actividadDiaTable.innerHTML = '';
@@ -1037,7 +987,7 @@ els.btnGenerar.addEventListener('click', async () => {
     const nuevos = advPayloads.asesoras ? Object.values(advPayloads.asesoras.por_embudo || {}).reduce((s, e) => s + e.llegaron, 0) : 0;
     const totalInscritos = Object.values(closedPayload.por_embudo || {}).reduce((s, e) => s + e.ganado, 0);
     const fallos = [rIA, rAs].filter(r => r.status === 'rejected').length;
-    setStatus(`Listo · ${fmtNum(delegados)} leads delegados por la IA · ${fmtNum(nuevos)} leads nuevos de las asesoras · ${fmtNum(totalInscritos)} inscritos · ${fmtNum(crossPayload.totales.leads_calificados)} oportunidades calientes` + (fallos ? ' · ' + fallos + ' sección(es) con error' : ''), fallos ? 'err' : 'ok');
+    setStatus(`Listo · ${fmtNum(nuevos)} leads nuevos de las asesoras · ${fmtNum(delegados)} leads delegados por la IA · ${fmtNum(totalInscritos)} inscritos · ${fmtNum(crossPayload.totales.leads_calificados)} leads calificados` + (fallos ? ' · ' + fallos + ' sección(es) con error' : ''), fallos ? 'err' : 'ok');
   } catch (err) {
     setStatus('No se pudo generar el reporte: ' + err.message, 'err');
     console.error(err);
@@ -1136,7 +1086,7 @@ function renderLeadsPorPeriodo(payload) {
         statCard('users', 'var(--ink-soft)', 'Con contacto por mensaje o llamada', fmtNum(ia.contactados || 0), 'se les escribió o llamó desde Kommo')
       : statCard('layers', 'var(--ink-soft)', 'Leads nuevos', fmtNum(totalAsesor), 'nacieron en CDMX o MTY en el periodo') +
         statCard('zap', 'var(--c-positive)', 'Con mensaje o llamada', fmtNum(ia.contactados || 0), 'ya se les escribió o llamó desde Kommo') +
-        statCard('users', 'var(--ink-soft)', 'Pasaron por la IA (sección de arriba)', fmtNum(ia.excluidos_por_ia || 0), 'no cuentan aquí')) +
+        statCard('users', 'var(--ink-soft)', 'Pasaron por la IA (sección del final)', fmtNum(ia.excluidos_por_ia || 0), 'no cuentan aquí')) +
     statCard('users', 'var(--ink-soft)', 'Asesoras con leads', filasAsesor.length) +
     (totalAsesor !== totalEmbudo
       ? statCard('xCircle', 'var(--c-loss)', 'Revisar', 'sumas no coinciden (' + totalAsesor + ' vs ' + totalEmbudo + ')')
@@ -1153,7 +1103,7 @@ function renderLeadsPorPeriodo(payload) {
     : '<div class="stat-icon" style="--stat-color:var(--c-neutral)">' + icon('users', 'var(--c-neutral)', 24) + '</div>' +
       '<div class="ia-callout-body">' +
         '<div class="ia-callout-title">En CDMX y MTY nacieron <span class="ia-callout-num">' + fmtNum(ia.leads_nuevos) + '</span> leads en el periodo y todos los atienden las asesoras.</div>' +
-        '<div class="ia-callout-text">Aquí no interviene la IA. Los leads que la IA atendió en redes sociales se ven en la sección de redes sociales' + (ia.excluidos_por_ia ? ' (' + fmtNum(ia.excluidos_por_ia) + ' en este periodo)' : '') + '.</div>' +
+        '<div class="ia-callout-text">Aquí no interviene la IA. Los leads que la IA atendió en redes sociales se ven al final de la página, en la sección de redes sociales' + (ia.excluidos_por_ia ? ' (' + fmtNum(ia.excluidos_por_ia) + ' en este periodo)' : '') + '.</div>' +
       '</div>';
 
   els.leadsPorAsesorTable.innerHTML = miniTabla(filasAsesor, TXT().colAsesor);
@@ -1269,7 +1219,7 @@ function renderCanales(perf, cierres) {
     </div>`;
 }
 
-/* ============================== RENDER: Oportunidades calientes ============================== */
+/* ============================== RENDER: Leads calificados (listado) ============================== */
 let leadsCalificadosDetalleData = [];
 let calificadosListaPage = 1;
 let calificadosEmbudoFiltro = '';
@@ -1323,10 +1273,10 @@ function actualizarFiltroEmbudoCalificados() {
 function renderLeadsCalificadosListado() {
   const vista = getLeadsCalificadosVista();
   const total = leadsCalificadosDetalleData.length;
-  els.calificadosListaTitulo.textContent = `Leads calientes (${total})`;
+  els.calificadosListaTitulo.textContent = `Leads calificados (${total})`;
 
   if (!total) {
-    els.calificadosListaTable.innerHTML = '<div class="empty">Sin leads calientes con estos filtros.</div>';
+    els.calificadosListaTable.innerHTML = '<div class="empty">Sin leads calificados con estos filtros.</div>';
     els.calificadosListaPaginacion.innerHTML = '';
     return;
   }
@@ -1391,7 +1341,7 @@ function descargarCsvCalificados() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `leads_calientes_${els.dateFrom.value || 'actual'}.csv`;
+  a.download = `leads_calificados_${els.dateFrom.value || 'actual'}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1402,8 +1352,6 @@ function renderCrosstab(payload) {
   actualizarBadgePeriodoCrosstab();
   const embudos = Object.values(payload.por_embudo || {});
   if (!embudos.length) {
-    els.crosstabStats.innerHTML = '';
-    els.crosstabTable.innerHTML = '<div class="empty">Sin resultados.</div>';
     leadsCalificadosDetalleData = [];
     calificadosListaPage = 1;
     calificadosEmbudoFiltro = '';
@@ -1411,33 +1359,6 @@ function renderCrosstab(payload) {
     renderLeadsCalificadosListado();
     return;
   }
-
-  // Columnas = unión de las etapas calientes POR NOMBRE: en redes sociales la caliente es Calificado; en CDMX y MTY son las de cita a pago
-  const etapas = [];
-  embudos.forEach(e => (e.por_etapa || []).forEach(s => { if (!etapas.includes(s.etapa)) etapas.push(s.etapa); }));
-  const cuenta = (e, nombre) => ((e.por_etapa || []).find(s => s.etapa === nombre) || {}).leads || 0;
-  const totalPorEtapa = etapas.map(nombre => embudos.reduce((s, e) => s + cuenta(e, nombre), 0));
-
-  els.crosstabStats.innerHTML = '<div class="stats-row">' +
-    statCard('target', 'var(--c-positive)', 'Leads calientes', fmtNum(payload.totales.leads_calificados)) +
-    etapas.map((nombre, i) => statCard('zap', 'var(--ink-soft)', nombre, fmtNum(totalPorEtapa[i]))).join('') +
-    (payload.totales.monto_calificado ? statCard('dollar', 'var(--ink-soft)', 'Monto', fmtMonto(payload.totales.monto_calificado)) : '') +
-    '</div>';
-
-  const rows = embudos.map(e => `<tr><td>${nombreEmbudo(e.embudo)}</td>` +
-    etapas.map(nombre => `<td class="num">${fmtNum(cuenta(e, nombre))}</td>`).join('') +
-    `<td class="num"><span class="numval">${fmtNum(e.leads_calificados)}</span></td></tr>`).join('');
-  els.crosstabTable.innerHTML = `
-    <div class="table-scroll">
-    <table>
-      <thead><tr><th>Embudo</th>${etapas.map(n => `<th class="num">${n}</th>`).join('')}<th class="num">Total</th></tr></thead>
-      <tbody>${rows}
-        <tr class="totales"><td>Total</td>${totalPorEtapa.map(n => `<td class="num">${fmtNum(n)}</td>`).join('')}<td class="num"><span class="numval">${fmtNum(payload.totales.leads_calificados)}</span></td></tr>
-      </tbody>
-    </table>
-    </div>`;
-  const excluidos = payload.embudos_excluidos_sin_etapa_calificado || [];
-  els.crosstabExcluidos.textContent = excluidos.length ? `No incluidos (sin etapas calientes): ${excluidos.map(nombreEmbudo).join(', ')}` : '';
 
   leadsCalificadosDetalleData = payload.leads_calificados_detalle || [];
   calificadosListaPage = 1;
@@ -1920,21 +1841,6 @@ function renderAtencion(payload) {
   els.atencionNota.textContent = (payload.nota_metodologica || '') + omit;
 }
 
-/* ============================== RENDER: Leads vivos en el embudo ============================== */
-function renderVivos(payload) {
-  const embudos = Object.values(payload.por_embudo || {});
-  const total = embudos.reduce((s, e) => s + e.leads_vivos, 0);
-  setHtml('vivosStats', '<div class="stats-row">' + statCard('layers', 'var(--ink-soft)', 'Leads vivos', fmtNum(total), 'abiertos hoy') +
-    embudos.map(e => statCard('layers', 'var(--ink-soft)', e.embudo, fmtNum(e.leads_vivos))).join('') + '</div>');
-  const bloque = (e) => {
-    const max = Math.max(1, ...e.por_etapa.map(s => s.leads));
-    const bonito = (n) => { const t = String(n).trim().replace(/\s+/g, ' '); return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase(); };
-    const filas = e.por_etapa.map(s => '<tr><td>' + escH(bonito(s.etapa)) + '</td><td class="num"><span class="numval">' + fmtNum(s.leads) + '</span></td><td style="width:38%"><span class="meta-progress-track"><span class="meta-progress-fill" style="width:' + Math.round((s.leads / max) * 100) + '%"></span></span></td></tr>').join('');
-    return '<div style="flex:1; min-width:300px;"><h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:0 0 6px;">' + escH(e.embudo) + ' · ' + fmtNum(e.leads_vivos) + ' vivos</h3>' +
-      '<div class="table-scroll"><table><thead><tr><th>Etapa</th><th class="num">Leads</th><th></th></tr></thead><tbody>' + filas + '</tbody></table></div></div>';
-  };
-  setHtml('vivosTable', embudos.length ? '<div style="display:flex; gap:22px; flex-wrap:wrap;">' + embudos.map(bloque).join('') + '</div>' : '<div class="empty">Sin leads vivos con estos filtros.</div>');
-}
 
 prepararBloques();
 aplicarTextosModo('ia', '');
