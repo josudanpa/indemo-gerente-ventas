@@ -1,0 +1,709 @@
+{
+ "name": "aristoteles - indemo (gerente de ventas: redes con IA + asesoras CDMX/MTY)",
+ "nodes": [
+  {
+   "id": "d91d32ee-1ebd-4c1e-9527-362798f6b707",
+   "name": "Webhook3",
+   "webhookId": "e8f62c5d-bbc2-45e6-8028-834cf3cc7416",
+   "type": "n8n-nodes-base.webhook",
+   "typeVersion": 2.1,
+   "position": [
+    -4496,
+    20016
+   ],
+   "parameters": {
+    "httpMethod": "POST",
+    "path": "GERENTE-VENTAS-INDEMO",
+    "responseMode": "responseNode",
+    "options": {
+     "allowedOrigins": "*"
+    }
+   }
+  },
+  {
+   "id": "525642f1-1d35-4fe0-aed7-3b9413bda60b",
+   "name": "Config4",
+   "type": "n8n-nodes-base.set",
+   "typeVersion": 3,
+   "position": [
+    -4224,
+    20016
+   ],
+   "parameters": {
+    "fields": {
+     "values": [
+      {
+       "name": "kommo_token",
+       "stringValue": "TOKEN_DE_KOMMO"
+      },
+      {
+       "name": "kommo_subdomain",
+       "stringValue": "graceindemocommx"
+      }
+     ]
+    },
+    "include": "none",
+    "options": {}
+   }
+  },
+  {
+   "id": "da01830e-01f6-44b3-9154-ac529b6d532f",
+   "name": "Switch Tipo3",
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3,
+   "position": [
+    -3888,
+    20000
+   ],
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-scan-001",
+          "leftValue": "={{ $('Webhook3').first().json.body.type }}",
+          "rightValue": "scan",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "scan"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-leads-002",
+          "leftValue": "={{ $('Webhook3').first().json.body.type }}",
+          "rightValue": "leads",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "leads"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "a42851b2-5fbf-4a04-9780-d07fd2b89111",
+   "name": "HTTP Pipelines3",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    -3488,
+    19872
+   ],
+   "parameters": {
+    "url": "=https://{{ $('Config4').first().json.kommo_subdomain }}.kommo.com/api/v4/leads/pipelines?limit=50",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      },
+      {
+       "name": "authorization",
+       "value": "=Bearer {{ $('Config4').first().json.kommo_token }}"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "570d5cdc-403a-4664-b76f-2cc1b4cec42e",
+   "name": "HTTP Tags3",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    -3264,
+    19872
+   ],
+   "parameters": {
+    "url": "=https://{{ $('Config4').first().json.kommo_subdomain }}.kommo.com/api/v4/leads/tags?limit=250",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      },
+      {
+       "name": "authorization",
+       "value": "=Bearer {{ $('Config4').first().json.kommo_token }}"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "a006c741-e7e9-4186-98f6-136ffcb6f251",
+   "name": "HTTP Users3",
+   "type": "n8n-nodes-base.httpRequest",
+   "typeVersion": 4.2,
+   "position": [
+    -3040,
+    19872
+   ],
+   "parameters": {
+    "url": "=https://{{ $('Config4').first().json.kommo_subdomain }}.kommo.com/api/v4/users?limit=250",
+    "sendHeaders": true,
+    "headerParameters": {
+     "parameters": [
+      {
+       "name": "Content-Type",
+       "value": "application/json"
+      },
+      {
+       "name": "authorization",
+       "value": "=Bearer {{ $('Config4').first().json.kommo_token }}"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "558f4419-c035-4e38-abdf-bae712c3f067",
+   "name": "Code Format Scan3",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2816,
+    19872
+   ],
+   "parameters": {
+    "jsCode": "const INCLUIR_EMBUDOS = [13934292,13634751,13848103];\nconst EXCLUIR_USUARIOS = [15352691,15839060];\nfunction parse(raw) {\n  if (raw && typeof raw.data === 'string') { try { return JSON.parse(raw.data); } catch(e) {} }\n  return raw || {};\n}\nconst pipesData = parse($('HTTP Pipelines3').first().json);\nconst tagsData  = parse($('HTTP Tags3').first().json);\nconst usersData = parse($('HTTP Users3').first().json);\nconst pipelines = ((pipesData._embedded || {}).pipelines || []).filter(p => INCLUIR_EMBUDOS.includes(p.id)).map(p => {\n  const stages = ((p._embedded || {}).statuses || []).filter(s => s.type !== 10000).sort((a,b)=>(a.sort||0)-(b.sort||0)).map(s=>({id:s.id,name:s.name}));\n  return { id: p.id, name: p.name, stages };\n});\nconst tags   = ((tagsData._embedded  || {}).tags  || []).map(t => ({ id: t.id, name: t.name })).sort((a, b) => a.name.localeCompare(b.name, 'es'));\nconst agents = ((usersData._embedded || {}).users || []).filter(u => !EXCLUIR_USUARIOS.includes(u.id)).map(u => ({ id: u.id, name: u.name }));\nreturn [{ json: { type: 'scan_result', pipelines, tags, agents } }];"
+   }
+  },
+  {
+   "id": "aaf5c735-ad6f-4947-9499-bea17e077ccc",
+   "name": "Respond Scan3",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1,
+   "position": [
+    -2592,
+    19872
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "id": "c9c1da62-2ea3-40e7-941e-612821b27be3",
+   "name": "Config Mapeo2",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -3488,
+    20192
+   ],
+   "parameters": {
+    "jsCode": "// Mapeo de embudos de INDEMO (gerente de ventas: indicadores base de Manu)\n// rol \"ia\" = REDES SOCIALES (Valentina): CALIFICADO es la etapa en que la IA delega. rol \"asesoras\" = CDMX y MTY: todo lo atienden las asesoras.\n// calificado = cita en campus | cotizacion = inicio de proceso de pago | efectivo = programa de interes | ganado = inscrito (142) y pago realizado | perdido = 143\n// calientes = etapas avanzadas vigentes (de cita en campus a inicio de proceso de pago). \"Largo plazo\" fuera de la escalera.\nreturn [{ json: {\n  \"embudos\": {\n    \"redes_sociales\": {\n      \"rol\": \"ia\",\n      \"pipeline_id\": 13934292,\n      \"contactado_frio\": 107529448,\n      \"efectivo\": 107529452,\n      \"cotizacion\": null,\n      \"calificado\": null,\n      \"ganado\": 142,\n      \"perdido\": 143,\n      \"ganado_ids\": [\n        142\n      ],\n      \"perdido_ids\": [\n        143\n      ],\n      \"cross_tab_calificados\": true,\n      \"tiempos\": false,\n      \"calientes\": [\n        {\n          \"id\": 107529456,\n          \"nombre\": \"Calificado\"\n        }\n      ],\n      \"stage_order\": [\n        107529444,\n        107529448,\n        107529452,\n        107529456\n      ],\n      \"nombres_etapas\": {\n        \"142\": \"Logrado con éxito\",\n        \"143\": \"Ventas perdidos\",\n        \"107529444\": \"Leads entrantes\",\n        \"107529448\": \"Contacto inicial\",\n        \"107529452\": \"Prospección\",\n        \"107529456\": \"Calificado\"\n      }\n    },\n    \"cdmx\": {\n      \"rol\": \"asesoras\",\n      \"pipeline_id\": 13634751,\n      \"contactado_frio\": 105223235,\n      \"efectivo\": 105223239,\n      \"calificado\": 105223243,\n      \"cotizacion\": 106820255,\n      \"ganado\": 142,\n      \"perdido\": 143,\n      \"ganado_ids\": [\n        142,\n        106820259\n      ],\n      \"perdido_ids\": [\n        143\n      ],\n      \"cross_tab_calificados\": true,\n      \"tiempos\": false,\n      \"calientes\": [\n        {\n          \"id\": 105223243,\n          \"nombre\": \"Cita en campus\"\n        },\n        {\n          \"id\": 105223247,\n          \"nombre\": \"Asistió a visita\"\n        },\n        {\n          \"id\": 106820239,\n          \"nombre\": \"Agendar clase muestra\"\n        },\n        {\n          \"id\": 106820243,\n          \"nombre\": \"Asistió a clase muestra\"\n        },\n        {\n          \"id\": 106822971,\n          \"nombre\": \"Entrevista de admisión\"\n        },\n        {\n          \"id\": 106820247,\n          \"nombre\": \"Propuesta de horarios\"\n        },\n        {\n          \"id\": 106820251,\n          \"nombre\": \"Elección de horarios\"\n        },\n        {\n          \"id\": 106820255,\n          \"nombre\": \"Inicio de proceso de pago\"\n        }\n      ],\n      \"stage_order\": [\n        105223231,\n        106820515,\n        105223235,\n        105223239,\n        105223243,\n        105223247,\n        106820239,\n        106820243,\n        106822971,\n        106820247,\n        106820251,\n        106820255,\n        106820259\n      ],\n      \"nombres_etapas\": {\n        \"142\": \"Inscrito\",\n        \"143\": \"Venta perdida\",\n        \"105223231\": \"Incoming leads\",\n        \"105223235\": \"Contactados\",\n        \"105223239\": \"Programa de interés\",\n        \"105223243\": \"Cita en campus\",\n        \"105223247\": \"Asistió a visita\",\n        \"106820239\": \"Agendar clase muestra\",\n        \"106820243\": \"Asistió a clase muestra\",\n        \"106820247\": \"Propuesta de horarios\",\n        \"106820251\": \"Elección de horarios\",\n        \"106820255\": \"Inicio de proceso de pago\",\n        \"106820259\": \"Pago realizado\",\n        \"106820515\": \"Asignación de leads\",\n        \"106822971\": \"Entrevista de admisión\",\n        \"110068240\": \"Largo plazo\"\n      }\n    },\n    \"mty\": {\n      \"rol\": \"asesoras\",\n      \"pipeline_id\": 13848103,\n      \"contactado_frio\": 106856551,\n      \"efectivo\": 106856555,\n      \"calificado\": 106856559,\n      \"cotizacion\": 106858695,\n      \"ganado\": 142,\n      \"perdido\": 143,\n      \"ganado_ids\": [\n        142\n      ],\n      \"perdido_ids\": [\n        143\n      ],\n      \"cross_tab_calificados\": true,\n      \"tiempos\": false,\n      \"calientes\": [\n        {\n          \"id\": 106856559,\n          \"nombre\": \"Cita en campus\"\n        },\n        {\n          \"id\": 106858587,\n          \"nombre\": \"Asistió a visita\"\n        },\n        {\n          \"id\": 106858591,\n          \"nombre\": \"Agendar clase muestra\"\n        },\n        {\n          \"id\": 106858595,\n          \"nombre\": \"Asistió a clase muestra\"\n        },\n        {\n          \"id\": 106858599,\n          \"nombre\": \"Entrevista de admisión\"\n        },\n        {\n          \"id\": 106858603,\n          \"nombre\": \"Propuesta de horarios\"\n        },\n        {\n          \"id\": 106858607,\n          \"nombre\": \"Elección de horarios\"\n        },\n        {\n          \"id\": 106858695,\n          \"nombre\": \"Inicio de proceso de pago\"\n        }\n      ],\n      \"stage_order\": [\n        106856547,\n        106974792,\n        106856551,\n        106856555,\n        106856559,\n        106858587,\n        106858591,\n        106858595,\n        106858599,\n        106858603,\n        106858607,\n        106858695\n      ],\n      \"nombres_etapas\": {\n        \"142\": \"Inscrito (pago realizado)\",\n        \"143\": \"Venta perdida\",\n        \"106856547\": \"Leads entrantes\",\n        \"106856551\": \"Contactados\",\n        \"106856555\": \"Programa de interés\",\n        \"106856559\": \"Cita en campus\",\n        \"106858587\": \"Asistió a visita\",\n        \"106858591\": \"Agendar clase muestra\",\n        \"106858595\": \"Asistió a clase muestra\",\n        \"106858599\": \"Entrevista de admisión\",\n        \"106858603\": \"Propuesta de horarios\",\n        \"106858607\": \"Elección de horarios\",\n        \"106858695\": \"Inicio de proceso de pago\",\n        \"106974792\": \"Asignación de leads\",\n        \"110068096\": \"Largo plazo\"\n      }\n    }\n  },\n  \"usuarios_excluidos\": [\n    15352691,\n    15839060\n  ],\n  \"leads_excluidos\": [\n    25385369\n  ],\n  \"tarea_tipo_cita\": 2,\n  \"lookback_dias\": 180,\n  \"umbral_sin_atender_horas\": 24,\n  \"horario\": {\n    \"tz\": -6,\n    \"ini\": 9,\n    \"fin\": 18,\n    \"dias\": [\n      1,\n      2,\n      3,\n      4,\n      5\n    ]\n  },\n  \"canales\": [\n    {\n      \"clave\": \"meta\",\n      \"nombre\": \"Meta (Facebook / Instagram)\",\n      \"etiquetas\": [\n        \"META\",\n        \"INSTAGRAM\",\n        \"INST\"\n      ],\n      \"patrones\": [\n        \"^fb\\\\d+$\"\n      ]\n    },\n    {\n      \"clave\": \"web\",\n      \"nombre\": \"Sitio web (landing / formulario)\",\n      \"etiquetas\": [\n        \"LANDING PAGE\",\n        \"LANDING MILÁN\",\n        \"MILAN\",\n        \"PÁGINA WEB\",\n        \"Form\"\n      ]\n    },\n    {\n      \"clave\": \"whatsapp\",\n      \"nombre\": \"WhatsApp directo\",\n      \"etiquetas\": [\n        \"WhatsApp\"\n      ]\n    },\n    {\n      \"clave\": \"remarketing\",\n      \"nombre\": \"Remarketing\",\n      \"etiquetas\": [\n        \"RETARGUETING\",\n        \"RMKTNG\",\n        \"DiplomadosRMKTG\",\n        \"ALUMNA-RETARGET\"\n      ]\n    },\n    {\n      \"clave\": \"eventos\",\n      \"nombre\": \"Eventos y ferias\",\n      \"etiquetas\": [\n        \"Feria Universidades\",\n        \"FIL\",\n        \"OPENDAY\"\n      ]\n    },\n    {\n      \"clave\": \"alianzas\",\n      \"nombre\": \"Alianzas\",\n      \"etiquetas\": [\n        \"ALIANZA\",\n        \"ALIANZA LCI\"\n      ]\n    },\n    {\n      \"clave\": \"directo\",\n      \"nombre\": \"Llamada o captura manual\",\n      \"etiquetas\": [\n        \"LLAMADA AL INSTITUTO\",\n        \"LEAD MANUAL\",\n        \"Correo Electrónico\"\n      ]\n    },\n    {\n      \"clave\": \"organico\",\n      \"nombre\": \"Orgánico\",\n      \"etiquetas\": [\n        \"Orgánico\",\n        \"organico\"\n      ]\n    }\n  ]\n} }];\n"
+   }
+  },
+  {
+   "id": "752fb722-9706-4831-aaec-3fc53a2b0e74",
+   "name": "Calcular Reporte Performance2",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20128
+   ],
+   "parameters": {
+    "jsCode": "// Lee body del webhook, config de Kommo y el mapeo de embudos\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\nconst mapeo = $('Config Mapeo2').first().json.embudos;\nconst canalesCfg = $('Config Mapeo2').first().json.canales || [];\nconst nombreCanal = { sin_canal: 'Sin etiqueta de canal' };\ncanalesCfg.forEach(c => { nombreCanal[c.clave] = c.nombre; });\n// Canal = primera regla de Config Mapeo cuyas etiquetas (o patrones) coincidan con las etiquetas del lead.\nfunction canalDeLead(lead) {\n  const tags = ((lead._embedded && lead._embedded.tags) || []).map(t => String(t.name));\n  const bajas = tags.map(t => t.toLowerCase());\n  for (const c of canalesCfg) {\n    const nombres = (c.etiquetas || []).map(x => String(x).toLowerCase());\n    const pats = (c.patrones || []).map(p => new RegExp(p, 'i'));\n    if (bajas.some(t => nombres.includes(t)) || tags.some(t => pats.some(re => re.test(t)))) return c.clave;\n  }\n  return 'sin_canal';\n}\nconst porCanal = {};\n\nif (!body || body.type !== 'leads') {\n  throw new Error(`Se esperaba type=\"leads\" pero llego type=\"${body && body.type}\". Revisa el cableado de Switch Tipo2: su salida 'leads' (indice 1) debe ir a Config Mapeo.`);\n}\nif (!body.date_from || !body.date_to) {\n  throw new Error('Faltan date_from/date_to en la solicitud. Sin esto, el filtro de fecha hacia Kommo queda invalido y regresa TODOS los leads de la cuenta sin filtrar.');\n}\n\nconst filterBy = (body.filter_by === 'closed_at') ? 'closed_at' : (body.filter_by === 'enrolled_at' ? 'enrolled_at' : 'created_at');\n\nfunction toUnixStart(dateStr) {\n  return Math.floor(new Date(`${dateStr}T00:00:00-06:00`).getTime() / 1000);\n}\nfunction toUnixEnd(dateStr) {\n  return Math.floor(new Date(`${dateStr}T23:59:59-06:00`).getTime() / 1000);\n}\n\nconst qp = [];\nfunction addParam(key, value) { qp.push(encodeURIComponent(key) + '=' + encodeURIComponent(value)); }\naddParam('with', 'loss_reason,tags,contacts,company');\naddParam('limit', '250');\nif (filterBy !== 'enrolled_at') {\n  addParam(`filter[${filterBy}][from]`, toUnixStart(body.date_from));\n  addParam(`filter[${filterBy}][to]`, toUnixEnd(body.date_to));\n}\nif (body.agent_ids && body.agent_ids.length) {\n  body.agent_ids.forEach(id => addParam('filter[responsible_user_id][]', id));\n}\nif (body.pipeline_ids && body.pipeline_ids.length) {\n  body.pipeline_ids.forEach(id => addParam('filter[pipeline_id][]', id));\n}\n\n// Filtro opcional de etiquetas: 100% manual, elegido en el dashboard (tag_ids).\n// Ya no hay etiquetas forzadas por embudo (antes web_edu_dc traia Meta/Google fijo).\nconst tagFilterSet = (body.tag_ids && body.tag_ids.length) ? new Set(body.tag_ids.map(Number)) : null;\n\n// Inscritos por fecha de inscripcion: leads que PASARON a una etapa de inscrito dentro del periodo (historial de etapas),\n// traidos por id y conservados solo si siguen en una etapa de inscrito. Respeta los filtros de embudo y de asesor.\nasync function leadsInscritosEnPeriodo() {\n  const hdr = { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' };\n  const objetivos = [];\n  for (const m of Object.values(mapeo)) {\n    if (body.pipeline_ids && body.pipeline_ids.length && !body.pipeline_ids.includes(m.pipeline_id)) continue;\n    for (const sid of m.ganado_ids) objetivos.push({ pipeline_id: m.pipeline_id, status_id: sid });\n  }\n  if (!objetivos.length) return [];\n  const eqp = [];\n  const addE = (k, v) => eqp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));\n  addE('filter[type][0]', 'lead_status_changed');\n  addE('filter[created_at][from]', toUnixStart(body.date_from));\n  addE('filter[created_at][to]', toUnixEnd(body.date_to));\n  objetivos.forEach((o, i) => {\n    addE(`filter[value_after][leads_statuses][${i}][pipeline_id]`, o.pipeline_id);\n    addE(`filter[value_after][leads_statuses][${i}][status_id]`, o.status_id);\n  });\n  addE('limit', '100');\n  const ids = new Set();\n  let urlE = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/events?${eqp.join('&')}`;\n  let guardE = 0;\n  while (urlE && guardE < 100) {\n    let r = await this.helpers.httpRequest({ method: 'GET', url: urlE, headers: hdr, json: true });\n    if (!r || typeof r !== 'object') r = {};\n    for (const ev of ((r._embedded && r._embedded.events) || [])) { if (ev.entity_id != null) ids.add(ev.entity_id); }\n    urlE = (r._links && r._links.next && r._links.next.href) || null;\n    guardE++;\n  }\n  const lista = [...ids];\n  const out = [];\n  for (let i = 0; i < lista.length; i += 100) {\n    const lote = lista.slice(i, i + 100);\n    const q = ['with=' + encodeURIComponent('loss_reason,tags,contacts,company'), 'limit=250'];\n    lote.forEach((id, k) => q.push(`filter%5Bid%5D%5B${k}%5D=${id}`));\n    let r = await this.helpers.httpRequest({ method: 'GET', url: `https://${cfg.kommo_subdomain}.kommo.com/api/v4/leads?${q.join('&')}`, headers: hdr, json: true });\n    if (!r || typeof r !== 'object') r = {};\n    out.push(...((r._embedded && r._embedded.leads) || []));\n  }\n  const ganadoPorEmbudo = {};\n  for (const m of Object.values(mapeo)) ganadoPorEmbudo[m.pipeline_id] = m.ganado_ids;\n  const agentes = (body.agent_ids || []).map(Number);\n  return out.filter(l => (ganadoPorEmbudo[l.pipeline_id] || []).includes(l.status_id)\n    && (!agentes.length || agentes.includes(Number(l.responsible_user_id))));\n}\n\nlet nextUrl = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/leads?${qp.join('&')}`;\nlet allLeads = [];\nlet guard = 0;\nif (filterBy === 'enrolled_at') {\n  allLeads = await leadsInscritosEnPeriodo.call(this);\n  nextUrl = null;\n}\n\nwhile (nextUrl && guard < 50) {\n  let resp = await this.helpers.httpRequest({\n    method: 'GET',\n    url: nextUrl,\n    headers: { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' },\n    json: true,\n  });\n  // Kommo regresa 204 sin cuerpo cuando no hay resultados; algunos clientes\n  // HTTP internos lo devuelven como null/\"\" en vez de un objeto. Se normaliza\n  // para no tronar el nodo en periodos/embudos sin leads.\n  if (!resp || typeof resp !== 'object') resp = {};\n  const pageLeads = (resp._embedded && resp._embedded.leads) || [];\n  allLeads = allLeads.concat(pageLeads);\n  nextUrl = (resp._links && resp._links.next && resp._links.next.href) || null;\n  guard++;\n}\n\nfunction buildPositionMap(stageOrder) {\n  const map = {};\n  stageOrder.forEach((stageId, idx) => { map[stageId] = idx; });\n  return map;\n}\n\n// ---------------------------------------------------------------------------\n// Credito historico para leads PERDIDOS: por peticion explicita de Manu (audio\n// del 3-jul-2026), un lead que se marca \"perdido\" hoy pierde todo su credito\n// de efectivo/cotizacion aunque de verdad haya llegado ahi antes de perderse.\n// Kommo no guarda \"por cuales etapas paso\" en el lead en si (/api/v4/leads\n// solo trae su etapa actual/final) -- hay que reconstruirlo con el historial\n// de cambios de estatus via /api/v4/events (mismo mecanismo que Calcular\n// Volumen Llamadas ya usa para las llamadas).\n//\n// Actualizado 3-jul-2026 tras un 400 real en produccion: el filtro\n// filter[entity_id] de /api/v4/events NO acepta notacion de arreglo, es un\n// solo string de hasta 10 IDs separados por coma (confirmado contra la doc\n// oficial: developers.kommo.com/reference/events-list). La forma de\n// value_after (value_after[0].lead_status.id/.pipeline_id) tambien quedo\n// confirmada contra esa misma documentacion -- eso ya no es una suposicion.\n//\n// Decision explicita (3-jul-2026): este credito historico solo aplica a\n// \"efectivo\" y \"cotizacion\". NO aplica a \"calificado\" -- se deja como esta\n// (solo cuenta si el lead sigue actualmente en esa etapa o mas adelante).\n// ---------------------------------------------------------------------------\n\nasync function fetchStatusHistory(leadIds) {\n  const ids = [...leadIds];\n  if (!ids.length) return [];\n  const out = [];\n  // Confirmado contra la documentacion oficial de Kommo (developers.kommo.com/\n  // reference/events-list): filter[entity_id] acepta UN string de hasta 10 IDs\n  // separados por coma -- NO notacion de arreglo filter[entity_id][0]=X&[1]=Y.\n  // Mandar mas de 10, o mandarlo como arreglo, es lo que causaba el 400.\n  const BATCH = 10;\n  for (let i = 0; i < ids.length; i += BATCH) {\n    const batch = ids.slice(i, i + BATCH);\n    const eqp = [];\n    function addE(k, v) { eqp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v)); }\n    addE('filter[type]', 'lead_status_changed');\n    addE('filter[entity]', 'lead');\n    addE('filter[entity_id]', batch.join(','));\n    addE('limit', '250');\n    let nextUrl = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/events?${eqp.join('&')}`;\n    let guard = 0;\n    while (nextUrl && guard < 50) {\n      let resp = await this.helpers.httpRequest({\n        method: 'GET',\n        url: nextUrl,\n        headers: { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' },\n        json: true,\n      });\n      if (!resp || typeof resp !== 'object') resp = {};\n      const page = (resp._embedded && resp._embedded.events) || [];\n      out.push(...page);\n      nextUrl = (resp._links && resp._links.next && resp._links.next.href) || null;\n      guard++;\n    }\n  }\n  return out;\n}\n\nfunction parseStatusEvent(ev) {\n  const after = ev.value_after && ev.value_after[0];\n  const statusObj = after && (after.lead_status || after.status || after);\n  if (!statusObj || statusObj.id == null) return null;\n  return {\n    leadId: ev.entity_id,\n    statusId: statusObj.id,\n    pipelineId: statusObj.pipeline_id != null ? statusObj.pipeline_id : null,\n  };\n}\n\nconst resultado = {};\n\nfor (const [key, mcfg] of Object.entries(mapeo)) {\n  if (body.pipeline_ids && body.pipeline_ids.length && !body.pipeline_ids.includes(mcfg.pipeline_id)) continue;\n\n  const posMap = buildPositionMap(mcfg.stage_order);\n  const efectivoPos = mcfg.efectivo != null ? posMap[mcfg.efectivo] : null;\n  const cotizacionPos = mcfg.cotizacion != null ? posMap[mcfg.cotizacion] : null;\n  const calificadoPos = mcfg.calificado != null ? posMap[mcfg.calificado] : null;\n\n  const acc = {\n    embudo: key,\n    pipeline_id: mcfg.pipeline_id,\n    total: 0,\n    efectivo: 0,\n    cotizacion: 0,\n    calificado: 0,\n    ganado: 0,\n    perdido: 0,\n    monto_ganado: 0,\n    monto_cotizacion: 0,\n    motivos_perdida: {},\n    perdidos_efectivo_historico: 0,\n    perdidos_cotizacion_historico: 0,\n    eventos_historial_reconocidos: 0\n  };\n\n  let leadsEmbudo = allLeads.filter(l => l.pipeline_id === mcfg.pipeline_id);\n  // Filtro opcional por etiquetas seleccionadas manualmente en el dashboard (aplica a cualquier embudo)\n  if (tagFilterSet) {\n    leadsEmbudo = leadsEmbudo.filter(l => {\n      const tags = (l._embedded && l._embedded.tags) || [];\n      return tags.some(t => tagFilterSet.has(Number(t.id)));\n    });\n  }\n  acc.total = leadsEmbudo.length;\n\n  // Historial de los perdidos: solo se pide si este embudo de verdad tiene\n  // configurada una etapa \"efectivo\" o \"cotizacion\" (si no tiene ninguna, no\n  // hay nada que acreditar y nos ahorramos las llamadas a Kommo).\n  const perdidoIds = leadsEmbudo.filter(l => mcfg.perdido_ids.includes(l.status_id)).map(l => l.id);\n  const maxPosPorLead = {};\n  if (perdidoIds.length && (efectivoPos != null || cotizacionPos != null)) {\n    const eventosHistorial = await fetchStatusHistory.call(this, perdidoIds);\n    for (const ev of eventosHistorial) {\n      const parsed = parseStatusEvent(ev);\n      if (!parsed) continue;\n      if (parsed.pipelineId != null && parsed.pipelineId !== mcfg.pipeline_id) continue;\n      const pos = posMap[parsed.statusId];\n      if (pos == null) continue;\n      acc.eventos_historial_reconocidos++;\n      if (maxPosPorLead[parsed.leadId] == null || pos > maxPosPorLead[parsed.leadId]) {\n        maxPosPorLead[parsed.leadId] = pos;\n      }\n    }\n  }\n\n  for (const lead of leadsEmbudo) {\n    if (mcfg.ganado_ids.includes(lead.status_id)) {\n      acc.ganado++;\n      acc.monto_ganado += (lead.price || 0);\n      acc.efectivo++;\n      if (cotizacionPos != null) { acc.cotizacion++; acc.monto_cotizacion += (lead.price || 0); }\n      if (calificadoPos != null) acc.calificado++;\n      continue;\n    }\n    if (mcfg.perdido_ids.includes(lead.status_id)) {\n      acc.perdido++;\n      const motivo = (lead._embedded && lead._embedded.loss_reason && lead._embedded.loss_reason[0] && lead._embedded.loss_reason[0].name) || 'Sin motivo registrado';\n      acc.motivos_perdida[motivo] = (acc.motivos_perdida[motivo] || 0) + 1;\n      // Credito historico: aunque hoy este perdido, si en su camino llego a\n      // \"efectivo\" o \"cotizacion\" antes de perderse, cuenta ahi tambien. No\n      // se le quita el conteo de \"perdido\" de arriba -- cuenta en los dos.\n      const maxPos = maxPosPorLead[lead.id];\n      if (maxPos != null) {\n        if (efectivoPos != null && maxPos >= efectivoPos) { acc.efectivo++; acc.perdidos_efectivo_historico++; }\n        if (cotizacionPos != null && maxPos >= cotizacionPos) { acc.cotizacion++; acc.perdidos_cotizacion_historico++; acc.monto_cotizacion += (lead.price || 0); }\n      }\n      continue;\n    }\n    const leadPos = posMap[lead.status_id];\n    if (leadPos == null) continue;\n    if (efectivoPos != null && leadPos >= efectivoPos) acc.efectivo++;\n    if (cotizacionPos != null && leadPos >= cotizacionPos) { acc.cotizacion++; acc.monto_cotizacion += (lead.price || 0); }\n    if (calificadoPos != null && leadPos >= calificadoPos) acc.calificado++;\n  }\n\n  // Canales: de los leads de este embudo, cuantos entraron, llegaron a cita y se inscribieron, por canal.\n  for (const lead of leadsEmbudo) {\n    const ck = canalDeLead(lead);\n    const ch = porCanal[ck] || (porCanal[ck] = { clave: ck, nombre: nombreCanal[ck], leads: 0, citas: 0, inscritos: 0, monto: 0 });\n    ch.leads++;\n    if (mcfg.ganado_ids.includes(lead.status_id)) { ch.inscritos++; ch.citas++; ch.monto += (lead.price || 0); continue; }\n    const posLead = posMap[lead.status_id];\n    if (posLead != null && calificadoPos != null && posLead >= calificadoPos) ch.citas++;\n  }\n  resultado[key] = acc;\n}\n\n// ---------------------------------------------------------------------------\n// Leads por periodo: dos desgloses de la MISMA poblacion de leads (por\n// asesor y por embudo) que por definicion tienen que sumar igual -- pedido\n// explicito de Manu para medir capacidad instalada (referencia: 250\n// leads/mes por asesor) y avance de meta de leads entrantes por embudo.\n//\n// Para que las sumas coincidan de verdad, \"leads por asesor\" se calcula\n// sobre la MISMA poblacion que ya usa el desglose por embudo de arriba:\n// leads cuyo pipeline_id es uno de los embudos incluidos (respeta\n// pipeline_ids si se filtro) y que pasan el mismo filtro de etiquetas.\n// \"leads por embudo\" simplemente reutiliza el total que ya se calculo\n// arriba por cada embudo (acc.total), no se vuelve a calcular aparte.\n// ---------------------------------------------------------------------------\nconst pipelineIdIncluido = {};\nfor (const [key, mcfg] of Object.entries(mapeo)) {\n  if (body.pipeline_ids && body.pipeline_ids.length && !body.pipeline_ids.includes(mcfg.pipeline_id)) continue;\n  pipelineIdIncluido[mcfg.pipeline_id] = true;\n}\n\nlet leadsParaPeriodo = allLeads.filter(l => pipelineIdIncluido[l.pipeline_id]);\nif (tagFilterSet) {\n  leadsParaPeriodo = leadsParaPeriodo.filter(l => {\n    const tags = (l._embedded && l._embedded.tags) || [];\n    return tags.some(t => tagFilterSet.has(Number(t.id)));\n  });\n}\n\nconst leadsPorAsesor = {};\nfor (const lead of leadsParaPeriodo) {\n  const uid = lead.responsible_user_id || 0;\n  leadsPorAsesor[uid] = (leadsPorAsesor[uid] || 0) + 1;\n}\n\nconst leadsPorEmbudo = {};\nfor (const [key, acc] of Object.entries(resultado)) {\n  leadsPorEmbudo[key] = acc.total;\n}\n\n// ---------------------------------------------------------------------------\n// Desglose de leads ganados (lista plana, no agrupada por embudo) -- pedido\n// explicito para mostrar cada venta individual: lead, contacto, monto,\n// compania, responsable, etiquetas. Kommo solo regresa el ID de contacto/\n// compania en el lead (via with=contacts,company), el nombre hay que\n// resolverlo aparte con un fetch por lote -- mismo patron que ya usa este\n// flujo para las notas de llamadas (filter[id][N]=X, tope de lote 100).\n// ---------------------------------------------------------------------------\nconst pipelineIdToGanadoStatus = {};\nfor (const [key, mcfg] of Object.entries(mapeo)) pipelineIdToGanadoStatus[mcfg.pipeline_id] = mcfg.ganado_ids;\n\nconst pipelineIdToKeyGanados = {};\nfor (const [key, mcfg] of Object.entries(mapeo)) pipelineIdToKeyGanados[mcfg.pipeline_id] = key;\n\nconst leadsGanados = allLeads.filter(l => (pipelineIdToGanadoStatus[l.pipeline_id] || []).includes(l.status_id));\n\nconst contactIdsGanados = new Set();\nconst companyIdsGanados = new Set();\nfor (const lead of leadsGanados) {\n  const contactos = (lead._embedded && lead._embedded.contacts) || [];\n  const principal = contactos.find(c => c.is_main) || contactos[0];\n  if (principal) contactIdsGanados.add(principal.id);\n  const companias = (lead._embedded && lead._embedded.companies) || [];\n  if (companias[0]) companyIdsGanados.add(companias[0].id);\n}\n\nasync function fetchNombresPorId(entityTypePlural, idsSet) {\n  const ids = [...idsSet];\n  const out = {};\n  if (!ids.length) return out;\n  const BATCH = 100;\n  for (let i = 0; i < ids.length; i += BATCH) {\n    const batch = ids.slice(i, i + BATCH);\n    const qp = batch.map((id, idx) => `filter%5Bid%5D%5B${idx}%5D=${id}`).join('&');\n    const url = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/${entityTypePlural}?${qp}&limit=250`;\n    let resp = await this.helpers.httpRequest({\n      method: 'GET', url,\n      headers: { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' },\n      json: true,\n    });\n    if (!resp || typeof resp !== 'object') resp = {};\n    const items = (resp._embedded && resp._embedded[entityTypePlural]) || [];\n    for (const it of items) out[it.id] = it.name;\n  }\n  return out;\n}\n\nconst [nombresContactos, nombresCompanias] = await Promise.all([\n  fetchNombresPorId.call(this, 'contacts', contactIdsGanados),\n  fetchNombresPorId.call(this, 'companies', companyIdsGanados),\n]);\n\nconst ganadosDetalle = leadsGanados.map(lead => {\n  const contactos = (lead._embedded && lead._embedded.contacts) || [];\n  const principal = contactos.find(c => c.is_main) || contactos[0];\n  const companias = (lead._embedded && lead._embedded.companies) || [];\n  const tags = ((lead._embedded && lead._embedded.tags) || []).map(t => t.name);\n  return {\n    lead_id: lead.id,\n    embudo: pipelineIdToKeyGanados[lead.pipeline_id] || null,\n    nombre_lead: lead.name || `Lead ${lead.id}`,\n    nombre_contacto: principal ? (nombresContactos[principal.id] || null) : null,\n    monto: lead.price || 0,\n    compania: companias[0] ? (nombresCompanias[companias[0].id] || null) : null,\n    responsible_user_id: lead.responsible_user_id || null,\n    etiquetas: tags,\n    canal: nombreCanal[canalDeLead(lead)],\n  };\n}).sort((a, b) => b.monto - a.monto);\n\nreturn [{ json: {\n  periodo: { from: body.date_from, to: body.date_to, filtrado_por: filterBy },\n  total_leads_extraidos: allLeads.length,\n  por_embudo: resultado,\n  ganados_detalle: ganadosDetalle,\n  leads_por_asesor: leadsPorAsesor,\n  leads_por_embudo: leadsPorEmbudo,\n  por_canal: Object.values(porCanal).sort((a, b) => (b.inscritos - a.inscritos) || (b.leads - a.leads))\n}}];"
+   }
+  },
+  {
+   "id": "69a4a8a7-fc8a-4044-a58d-547943f8b89c",
+   "name": "Respond Leads2",
+   "type": "n8n-nodes-base.respondToWebhook",
+   "typeVersion": 1,
+   "position": [
+    -2752,
+    20192
+   ],
+   "parameters": {
+    "respondWith": "allIncomingItems",
+    "options": {}
+   }
+  },
+  {
+   "id": "49fc86cf-c90c-45e4-bf89-c8c0e0c97eac",
+   "name": "Switch Vista2",
+   "type": "n8n-nodes-base.switch",
+   "typeVersion": 3,
+   "position": [
+    -3232,
+    20128
+   ],
+   "parameters": {
+    "rules": {
+     "values": [
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-perf-001",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "performance",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "performance"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-cross-002",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "qualified_crosstab",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "qualified_crosstab"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-resptime-003",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "response_times",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "response_times"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-live-004",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "live_leads",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "live_leads"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-activ-005",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "activities",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "activities"
+      },
+      {
+       "conditions": {
+        "options": {
+         "caseSensitive": true,
+         "leftValue": "",
+         "typeValidation": "strict",
+         "version": 1
+        },
+        "conditions": [
+         {
+          "id": "cond-advisors-006",
+          "leftValue": "={{ $('Webhook3').first().json.body.view }}",
+          "rightValue": "advisors",
+          "operator": {
+           "type": "string",
+           "operation": "equals",
+           "name": "filter.operator.equals"
+          }
+         }
+        ],
+        "combinator": "and"
+       },
+       "renameOutput": true,
+       "outputKey": "advisors"
+      }
+     ]
+    },
+    "options": {}
+   }
+  },
+  {
+   "id": "6a8a65c7-1eec-4d4d-b388-c0ce33609bb3",
+   "name": "Calcular Cross-tab Calificados2",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20272
+   ],
+   "parameters": {
+    "jsCode": "// Oportunidades calientes: leads que HOY estan en alguna etapa caliente de cada embudo\n// (PROSPECTO HOT, CITAS HOT, DOCUMENTOS HOT, EVALUACION, CIERRE HOT; ver `calientes` en Config Mapeo).\n// Mantiene los nombres de campos del cross-tab de calificados para no romper al dashboard.\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\nconst mapeo = $('Config Mapeo2').first().json.embudos;\n\nif (!body || body.type !== 'leads' || body.view !== 'qualified_crosstab') {\n  throw new Error(`Se esperaba type=\"leads\" y view=\"qualified_crosstab\" pero llego type=\"${body && body.type}\", view=\"${body && body.view}\".`);\n}\n\nfunction toUnixStart(dateStr) { return Math.floor(new Date(`${dateStr}T00:00:00-06:00`).getTime() / 1000); }\nfunction toUnixEnd(dateStr) { return Math.floor(new Date(`${dateStr}T23:59:59-06:00`).getTime() / 1000); }\n\nconst embudosCalientes = Object.entries(mapeo).filter(([k, m]) => m.cross_tab_calificados && (m.calientes || []).length);\nconst embudosExcluidos = Object.entries(mapeo).filter(([k, m]) => !m.cross_tab_calificados || !(m.calientes || []).length).map(([k]) => k);\n\n// Filtros opcionales del dashboard: etiquetas, agentes y embudos\nconst tagFilterSet = (body.tag_ids && body.tag_ids.length) ? new Set(body.tag_ids.map(Number)) : null;\nconst agentIds = (body.agent_ids || []).map(Number);\nconst pipelineIds = (body.pipeline_ids || []).map(Number);\n\nconst resultado = {};\nconst detalleRaw = [];\n\nfor (const [key, mcfg] of embudosCalientes) {\n  if (pipelineIds.length && !pipelineIds.includes(mcfg.pipeline_id)) continue;\n\n  const qp = [];\n  const addParam = (k, v) => qp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));\n  addParam('limit', '250');\n  addParam('with', 'tags,contacts');\n  mcfg.calientes.forEach((s, i) => {\n    addParam(`filter[statuses][${i}][pipeline_id]`, mcfg.pipeline_id);\n    addParam(`filter[statuses][${i}][status_id]`, s.id);\n  });\n  agentIds.forEach((id, i) => addParam(`filter[responsible_user_id][${i}]`, id));\n  if (body.date_from && body.date_to) {\n    addParam('filter[created_at][from]', toUnixStart(body.date_from));\n    addParam('filter[created_at][to]', toUnixEnd(body.date_to));\n  }\n\n  let nextUrl = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/leads?${qp.join('&')}`;\n  let leadsEmbudo = [];\n  let guard = 0;\n  while (nextUrl && guard < 50) {\n    let resp = await this.helpers.httpRequest({\n      method: 'GET',\n      url: nextUrl,\n      headers: { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' },\n      json: true,\n    });\n    // Kommo regresa 204 sin cuerpo cuando no hay resultados.\n    if (!resp || typeof resp !== 'object') resp = {};\n    leadsEmbudo = leadsEmbudo.concat((resp._embedded && resp._embedded.leads) || []);\n    nextUrl = (resp._links && resp._links.next && resp._links.next.href) || null;\n    guard++;\n  }\n\n  if (tagFilterSet) {\n    leadsEmbudo = leadsEmbudo.filter(l => ((l._embedded && l._embedded.tags) || []).some(t => tagFilterSet.has(Number(t.id))));\n  }\n\n  const conteoPorEtapa = {};\n  for (const l of leadsEmbudo) conteoPorEtapa[l.status_id] = (conteoPorEtapa[l.status_id] || 0) + 1;\n\n  resultado[key] = {\n    embudo: key,\n    pipeline_id: mcfg.pipeline_id,\n    leads_calificados: leadsEmbudo.length,\n    monto_calificado: leadsEmbudo.reduce((sum, l) => sum + (l.price || 0), 0),\n    por_etapa: mcfg.calientes.map(s => ({ etapa_id: s.id, etapa: s.nombre, leads: conteoPorEtapa[s.id] || 0 })),\n  };\n  for (const lead of leadsEmbudo) detalleRaw.push({ lead, embudoKey: key, mcfg });\n}\n\n// Nombre y correo del contacto principal (mismo patron que el resto del flujo: lookup por lote)\nconst contactIds = new Set();\nfor (const { lead } of detalleRaw) {\n  const contactos = (lead._embedded && lead._embedded.contacts) || [];\n  const principal = contactos.find(c => c.is_main) || contactos[0];\n  if (principal) contactIds.add(principal.id);\n}\n\nasync function fetchContactosPorId(idsSet) {\n  const ids = [...idsSet];\n  const out = {};\n  if (!ids.length) return out;\n  const BATCH = 100;\n  for (let i = 0; i < ids.length; i += BATCH) {\n    const batch = ids.slice(i, i + BATCH);\n    const qp2 = batch.map((id, idx) => `filter%5Bid%5D%5B${idx}%5D=${id}`).join('&');\n    const url = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/contacts?${qp2}&limit=250`;\n    let resp = await this.helpers.httpRequest({\n      method: 'GET', url,\n      headers: { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' },\n      json: true,\n    });\n    if (!resp || typeof resp !== 'object') resp = {};\n    for (const it of ((resp._embedded && resp._embedded.contacts) || [])) {\n      const campoEmail = (it.custom_fields_values || []).find(f => f.field_code === 'EMAIL');\n      const correo = (campoEmail && campoEmail.values && campoEmail.values[0] && campoEmail.values[0].value) || null;\n      out[it.id] = { name: it.name, correo };\n    }\n  }\n  return out;\n}\n\nconst contactos = await fetchContactosPorId.call(this, contactIds);\n\nconst detalle = detalleRaw.map(({ lead, embudoKey, mcfg }) => {\n  const cs = (lead._embedded && lead._embedded.contacts) || [];\n  const principal = cs.find(c => c.is_main) || cs[0];\n  const info = principal ? contactos[principal.id] : null;\n  const idxEtapa = mcfg.calientes.findIndex(s => s.id === lead.status_id);\n  return {\n    lead_id: lead.id,\n    nombre: (info && info.name) || lead.name || `Lead ${lead.id}`,\n    correo: (info && info.correo) || null,\n    embudo: embudoKey,\n    monto: lead.price || 0,\n    etapa: idxEtapa >= 0 ? mcfg.calientes[idxEtapa].nombre : null,\n    etapa_orden: idxEtapa,\n    responsible_user_id: lead.responsible_user_id || null,\n    actualizado: lead.updated_at || null,\n  };\n}).sort((a, b) => a.embudo.localeCompare(b.embudo) || (b.etapa_orden - a.etapa_orden) || ((a.actualizado || 0) - (b.actualizado || 0)));\n\nconst totales = Object.values(resultado).reduce((acc, e) => {\n  acc.leads_calificados += e.leads_calificados;\n  acc.monto_calificado += e.monto_calificado;\n  return acc;\n}, { leads_calificados: 0, monto_calificado: 0 });\n\nreturn [{ json: {\n  periodo: (body.date_from && body.date_to) ? { from: body.date_from, to: body.date_to } : 'snapshot_actual_sin_filtro_de_fecha',\n  por_embudo: resultado,\n  totales,\n  embudos_excluidos_sin_etapa_calificado: embudosExcluidos,\n  leads_calificados_detalle: detalle,\n}}];\n"
+   }
+  },
+  {
+   "id": "4f6be714-0b50-4e9e-93fb-ddf28d67f944",
+   "name": "Calcular Tiempos de Respuesta2",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20592
+   ],
+   "parameters": {
+    "jsCode": "// Lee body, config de Kommo y el mapeo de embudos\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\nconst mapeo = $('Config Mapeo2').first().json.embudos;\n\nif (!body || body.type !== 'leads' || body.view !== 'response_times') {\n  throw new Error(`Se esperaba type='leads' y view='response_times' pero llego type='${body && body.type}', view='${body && body.view}'.`);\n}\nif (!body.date_from || !body.date_to) {\n  throw new Error('Faltan date_from/date_to en la solicitud.');\n}\n\nfunction toUnixStart(dateStr) { return Math.floor(new Date(`${dateStr}T00:00:00-06:00`).getTime() / 1000); }\nfunction toUnixEnd(dateStr)   { return Math.floor(new Date(`${dateStr}T23:59:59-06:00`).getTime() / 1000); }\n\nconst fromTs = toUnixStart(body.date_from);\nconst toTs   = toUnixEnd(body.date_to);\n\nfunction buildHeaders() {\n  return { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' };\n}\n\n// ---------------------------------------------------------------------------\n// HORARIO LABORAL: lunes a viernes, 9:00-18:00, hora local UTC-6 fija\n// (Mexico, sin horario de verano -- mismo criterio\n// que ya usa el resto del flujo). Parametrizado explicitamente por el cliente.\n// ---------------------------------------------------------------------------\nconst TZ_OFFSET_SECONDS = -6 * 3600;\nconst DAY_SECONDS = 86400;\nconst BIZ_START_HOUR = 9;\nconst BIZ_END_HOUR = 18;\n\nfunction businessSecondsBetween(startTs, endTs) {\n  if (endTs == null || startTs == null || endTs <= startTs) return 0;\n  const localStart = startTs + TZ_OFFSET_SECONDS;\n  const localEnd = endTs + TZ_OFFSET_SECONDS;\n  let dayCursor = Math.floor(localStart / DAY_SECONDS) * DAY_SECONDS;\n  let total = 0;\n  let guard = 0;\n  while (dayCursor < localEnd && guard < 3660) {\n    const dow = new Date(dayCursor * 1000).getUTCDay();\n    if (dow >= 1 && dow <= 5) {\n      const bizOpen = dayCursor + BIZ_START_HOUR * 3600;\n      const bizClose = dayCursor + BIZ_END_HOUR * 3600;\n      const overlapStart = Math.max(localStart, bizOpen);\n      const overlapEnd = Math.min(localEnd, bizClose);\n      if (overlapEnd > overlapStart) total += (overlapEnd - overlapStart);\n    }\n    dayCursor += DAY_SECONDS;\n    guard++;\n  }\n  return total;\n}\n\n// PASO 1 - Leads creados en el periodo, con su contacto vinculado.\nconst qp = [];\nfunction addParam(k, v) { qp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v)); }\naddParam('limit', '250');\naddParam('with', 'contacts');\naddParam('filter[created_at][from]', fromTs);\naddParam('filter[created_at][to]', toTs);\n// Solo se miden los embudos con tiempos != false (Push es difusion saliente: ahi el primer mensaje lo manda el sistema).\nconst permitidos = Object.values(mapeo).filter(m => m.tiempos !== false).map(m => m.pipeline_id);\nconst pidsFiltro = (body.pipeline_ids && body.pipeline_ids.length)\n  ? body.pipeline_ids.map(Number).filter(id => permitidos.includes(id))\n  : permitidos;\nif (!pidsFiltro.length) {\n  return [{ json: { periodo: { from: body.date_from, to: body.date_to }, por_embudo: {}, nota_metodologica: 'Los embudos elegidos no entran en la medicion de tiempos de respuesta (Push es difusion saliente).' } }];\n}\npidsFiltro.forEach(id => addParam('filter[pipeline_id][]', id));\n\nlet nextUrl = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/leads?${qp.join('&')}`;\nlet allLeads = [];\nlet guard = 0;\nwhile (nextUrl && guard < 50) {\n  let resp = await this.helpers.httpRequest({ method: 'GET', url: nextUrl, headers: buildHeaders(), json: true });\n  if (!resp || typeof resp !== 'object') resp = {};\n  const page = (resp._embedded && resp._embedded.leads) || [];\n  allLeads = allLeads.concat(page);\n  nextUrl = (resp._links && resp._links.next && resp._links.next.href) || null;\n  guard++;\n}\n\n// leadsPorContacto: contact_id -> [leads de ESTE lote que comparten ese contacto]\n// (normalmente 1, pero un contacto puede repetirse si es cliente recurrente)\nconst leadsPorContacto = {};\nconst contactIdsUnicos = new Set();\nfor (const lead of allLeads) {\n  const contactos = (lead._embedded && lead._embedded.contacts) || [];\n  if (!contactos.length) continue;\n  const cid = contactos[0].id;\n  contactIdsUnicos.add(cid);\n  (leadsPorContacto[cid] = leadsPorContacto[cid] || []).push(lead);\n}\n\n// ---------------------------------------------------------------------------\n// Primer contacto real = el primero que ocurra entre (a) mensaje saliente del\n// asesor/bot o (b) llamada saliente -- a veces se llama antes de escribir.\n// Ambos se piden juntos via /api/v4/events con filter[entity]=contact.\n//\n// OJO -- Kommo etiqueta cada tipo distinto en la respuesta (confirmado contra\n// la cuenta real):\n//  - outgoing_chat_message: entity_type='lead', entity_id=<id del lead> ya\n//    resuelto por Kommo (viene del \"talk\" vinculado al lead activo).\n//  - outgoing_call: entity_type='contact', entity_id=<id del CONTACTO> -- aqui\n//    si hay que resolver nosotros a que lead corresponde, usando el lead mas\n//    reciente de ese contacto creado antes o al momento de la llamada.\n// ---------------------------------------------------------------------------\nasync function fetchPrimerContacto(contactIds) {\n  const ids = [...contactIds];\n  if (!ids.length) return [];\n  const out = [];\n  const BATCH = 10; // filter[entity_id] acepta max 10 ids por string, igual que el resto del flujo\n  for (let i = 0; i < ids.length; i += BATCH) {\n    const batch = ids.slice(i, i + BATCH);\n    const eqp = [];\n    function addE(k, v) { eqp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v)); }\n    addE('filter[type][0]', 'outgoing_chat_message');\n    addE('filter[type][1]', 'outgoing_call');\n    addE('filter[entity]', 'contact');\n    addE('filter[entity_id]', batch.join(','));\n    addE('limit', '250');\n    let url = `https://${cfg.kommo_subdomain}.kommo.com/api/v4/events?${eqp.join('&')}`;\n    let guard2 = 0;\n    while (url && guard2 < 50) {\n      let resp = await this.helpers.httpRequest({ method: 'GET', url, headers: buildHeaders(), json: true });\n      if (!resp || typeof resp !== 'object') resp = {};\n      const page = (resp._embedded && resp._embedded.events) || [];\n      out.push(...page);\n      url = (resp._links && resp._links.next && resp._links.next.href) || null;\n      guard2++;\n    }\n  }\n  return out;\n}\n\nconst eventosContacto = await fetchPrimerContacto.call(this, contactIdsUnicos);\n\nconst primeraSalidaPorLead = {};\nfunction considerar(leadId, ts) {\n  if (ts == null || leadId == null) return;\n  if (primeraSalidaPorLead[leadId] == null || ts < primeraSalidaPorLead[leadId]) {\n    primeraSalidaPorLead[leadId] = ts;\n  }\n}\n\nfor (const ev of eventosContacto) {\n  const ts = ev.created_at;\n  if (ts == null) continue;\n  if (ev.entity_type === 'lead' && ev.entity_id != null) {\n    // Mensajes: Kommo ya resuelve el lead directamente\n    considerar(ev.entity_id, ts);\n  } else if (ev.entity_type === 'contact' && ev.entity_id != null) {\n    // Llamadas: vienen etiquetadas al contacto, se resuelve al lead mas\n    // reciente de ese contacto que ya existia al momento de la llamada.\n    const candidatos = (leadsPorContacto[ev.entity_id] || []).filter(l => l.created_at <= ts);\n    if (!candidatos.length) continue;\n    candidatos.sort((a, b) => b.created_at - a.created_at);\n    considerar(candidatos[0].id, ts);\n  }\n}\n\n// PASO 2 - Agrupar por embudo y promediar (tiempo real Y tiempo en horario laboral)\nconst pipelineIdToKey = {};\nfor (const [key, mcfg] of Object.entries(mapeo)) pipelineIdToKey[mcfg.pipeline_id] = key;\n\nconst resultado = {};\nfor (const [key, mcfg] of Object.entries(mapeo)) {\n  if (body.pipeline_ids && body.pipeline_ids.length && !body.pipeline_ids.includes(mcfg.pipeline_id)) continue;\n  if (mcfg.tiempos === false) continue;\n  resultado[key] = {\n    embudo: key,\n    pipeline_id: mcfg.pipeline_id,\n    leads_entrantes: 0,\n    leads_con_respuesta: 0,\n    leads_pendientes: 0,\n    promedio_segundos_habiles: 0,\n    promedio_segundos_real: 0,\n  };\n}\n\nconst sumaHabilesPorEmbudo = {};\nconst sumaRealPorEmbudo = {};\nfor (const lead of allLeads) {\n  const key = pipelineIdToKey[lead.pipeline_id];\n  const entry = key && resultado[key];\n  if (!entry) continue;\n  entry.leads_entrantes++;\n\n  const primeraTs = primeraSalidaPorLead[lead.id];\n  if (primeraTs == null) { entry.leads_pendientes++; continue; }\n\n  // Si el primer contacto ocurrio antes de que el lead quedara formalmente\n  // creado (contacto con conversacion ya abierta), cuenta como respuesta\n  // inmediata (0s) en vez de descartarse.\n  const deltaReal = Math.max(0, primeraTs - lead.created_at);\n  const deltaHabil = businessSecondsBetween(lead.created_at, primeraTs);\n\n  entry.leads_con_respuesta++;\n  sumaRealPorEmbudo[key] = (sumaRealPorEmbudo[key] || 0) + deltaReal;\n  sumaHabilesPorEmbudo[key] = (sumaHabilesPorEmbudo[key] || 0) + deltaHabil;\n}\n\nfor (const [key, entry] of Object.entries(resultado)) {\n  entry.promedio_segundos_real = entry.leads_con_respuesta ? Math.round(sumaRealPorEmbudo[key] / entry.leads_con_respuesta) : 0;\n  entry.promedio_segundos_habiles = entry.leads_con_respuesta ? Math.round(sumaHabilesPorEmbudo[key] / entry.leads_con_respuesta) : 0;\n}\n\nreturn [{ json: {\n  periodo: { from: body.date_from, to: body.date_to },\n  por_embudo: resultado,\n  nota_metodologica: 'Hora entrante = created_at nativo del lead. Primera respuesta = el primero que ocurra entre el primer outgoing_chat_message o la primera outgoing_call asociados a ese lead (via /api/v4/events sobre el contacto vinculado). El promedio principal (promedio_segundos_habiles) solo cuenta segundos dentro de horario laboral lunes a viernes 9:00-18:00 hora local (UTC-6 fijo); promedio_segundos_real es el tiempo de reloj sin ajustar, de referencia. leads_pendientes queda en el JSON como referencia interna pero ya no se muestra como columna en el dashboard. Solo se miden los embudos de entrada (Embudo general y Pull); Push es difusion saliente, ahi el primer mensaje lo manda el sistema. Las respuestas del agente de IA cuentan como primera respuesta.'\n}}];"
+   }
+  },
+  {
+   "id": "1f7b3f1b-9105-430d-83e5-bce4fcdbccbe",
+   "name": "Calcular Leads Vivos1",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20572
+   ],
+   "parameters": {
+    "jsCode": "// Leads vivos por embudo: mismo criterio que el filtro \"Leads activos\" de Kommo\n// (todo lo que NO esta en Ganado (142) ni en Perdido/Cerrado (143)). Foto actual,\n// sin filtro de fechas. Lee los embudos y etapas en vivo de Kommo, asi que cubre\n// embudos nuevos sin tocar Config Mapeo.\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\n\nif (!body || body.type !== 'leads' || body.view !== 'live_leads') {\n  throw new Error(`Se esperaba type=\"leads\" y view=\"live_leads\" pero llego type=\"${body && body.type}\", view=\"${body && body.view}\".`);\n}\n\nconst headers = { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' };\nconst base = `https://${cfg.kommo_subdomain}.kommo.com/api/v4`;\nconst mapeoCfg = $('Config Mapeo2').first().json.embudos;\nconst CERRADOS = new Set([142, 143]);\nfor (const m of Object.values(mapeoCfg)) { (m.ganado_ids || []).concat(m.perdido_ids || []).forEach(id => CERRADOS.add(id)); }\n\nconst httpGet = async (url) => {\n  let resp = await this.helpers.httpRequest({ method: 'GET', url, headers, json: true });\n  // Kommo regresa 204 sin cuerpo cuando no hay resultados.\n  if (!resp || typeof resp !== 'object') resp = {};\n  return resp;\n};\n\nconst pipelineFilter = (body.pipeline_ids && body.pipeline_ids.length) ? new Set(body.pipeline_ids.map(Number)) : null;\nconst agentIds = (body.agent_ids || []).map(Number);\nconst tagFilterSet = (body.tag_ids && body.tag_ids.length) ? new Set(body.tag_ids.map(Number)) : null;\n\nconst respPipelines = await httpGet(`${base}/leads/pipelines`);\nconst pipelines = ((respPipelines._embedded && respPipelines._embedded.pipelines) || [])\n  .filter(p => !pipelineFilter || pipelineFilter.has(Number(p.id)))\n  .sort((a, b) => (a.sort || 0) - (b.sort || 0));\n\nconst porEmbudo = {};\nlet totalLeadsVivos = 0;\n\nfor (const p of pipelines) {\n  const etapas = ((p._embedded && p._embedded.statuses) || [])\n    .filter(s => !CERRADOS.has(s.id));\n\n  let leads = [];\n  if (etapas.length) {\n    const qp = [];\n    const add = (k, v) => qp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));\n    add('limit', '250');\n    if (tagFilterSet) add('with', 'tags');\n    etapas.forEach((s, i) => {\n      add(`filter[statuses][${i}][pipeline_id]`, p.id);\n      add(`filter[statuses][${i}][status_id]`, s.id);\n    });\n    agentIds.forEach((id, i) => add(`filter[responsible_user_id][${i}]`, id));\n\n    let nextUrl = `${base}/leads?${qp.join('&')}`;\n    let guard = 0;\n    while (nextUrl && guard < 100) {\n      const resp = await httpGet(nextUrl);\n      leads = leads.concat((resp._embedded && resp._embedded.leads) || []);\n      nextUrl = (resp._links && resp._links.next && resp._links.next.href) || null;\n      guard++;\n    }\n  }\n\n  if (tagFilterSet) {\n    leads = leads.filter(l => ((l._embedded && l._embedded.tags) || []).some(t => tagFilterSet.has(Number(t.id))));\n  }\n\n  const conteoPorEtapa = {};\n  for (const l of leads) conteoPorEtapa[l.status_id] = (conteoPorEtapa[l.status_id] || 0) + 1;\n\n  porEmbudo[p.id] = {\n    embudo_id: p.id,\n    embudo: p.name,\n    leads_vivos: leads.length,\n    por_etapa: etapas.map(s => ({ etapa_id: s.id, etapa: s.name, leads: conteoPorEtapa[s.id] || 0 })),\n  };\n  totalLeadsVivos += leads.length;\n}\n\nreturn [{ json: {\n  criterio: 'etapas activas (excluye Inscrito/Ganado y Descartado/Perdido), foto actual',\n  por_embudo: porEmbudo,\n  total_leads_vivos: totalLeadsVivos,\n}}];\n"
+   }
+  },
+  {
+   "id": "394c7256-45da-4bf0-8efb-b64991bd288a",
+   "name": "Calcular Actividades",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20740
+   ],
+   "parameters": {
+    "jsCode": "// Actividad diaria por asesor SIN Twilio: mensajes de WhatsApp enviados por una persona desde Kommo,\n// notas, tareas completadas y citas (tareas de tipo \"Reunión\" con fecha dentro del periodo).\n// Los mensajes del bot/automatizaciones salen con created_by = 0, asi que no se mezclan con los de las personas.\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\nconst conf = $('Config Mapeo2').first().json;\n\nif (!body || body.type !== 'leads' || body.view !== 'activities') {\n  throw new Error(`Se esperaba type=\"leads\" y view=\"activities\" pero llego type=\"${body && body.type}\", view=\"${body && body.view}\".`);\n}\nif (!body.date_from || !body.date_to) {\n  throw new Error('Faltan date_from/date_to en la solicitud.');\n}\n\nconst TZ_OFFSET_SECONDS = -6 * 3600; // Mexico, sin horario de verano\nconst toStart = (d) => Math.floor(new Date(`${d}T00:00:00-06:00`).getTime() / 1000);\nconst toEnd = (d) => Math.floor(new Date(`${d}T23:59:59-06:00`).getTime() / 1000);\nconst fromTs = toStart(body.date_from);\nconst toTs = toEnd(body.date_to);\nconst diaLocal = (ts) => new Date((ts + TZ_OFFSET_SECONDS) * 1000).toISOString().slice(0, 10);\n\nconst headers = { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' };\nconst base = `https://${cfg.kommo_subdomain}.kommo.com/api/v4`;\nconst httpGet = async (url) => {\n  let resp = await this.helpers.httpRequest({ method: 'GET', url, headers, json: true });\n  // Kommo regresa 204 sin cuerpo cuando no hay resultados.\n  if (!resp || typeof resp !== 'object') resp = {};\n  return resp;\n};\n\n// Usuarios: todos menos los excluidos del mapeo (p. ej. Educacion continua); si el dashboard\n// eligio agentes, solo esos.\nconst respUsers = await httpGet(`${base}/users?limit=250`);\nconst excluidos = (conf.usuarios_excluidos || []).map(Number);\nconst usuarios = ((respUsers._embedded && respUsers._embedded.users) || []).filter(u => !excluidos.includes(Number(u.id)));\nconst pedidos = (body.agent_ids || []).map(Number);\nconst objetivo = pedidos.length ? usuarios.filter(u => pedidos.includes(Number(u.id))) : usuarios;\n\nconst TIPOS = { outgoing_chat_message: 'wa', common_note_added: 'notas', task_completed: 'tareas' };\nconst porAsesor = {};\nconst porDia = {};\nconst porDiaAsesor = {};\n\nfunction sumarDia(dia, uid, clave) {\n  if (!porDia[dia]) porDia[dia] = { fecha: dia, wa: 0, notas: 0, tareas: 0, citas: 0 };\n  porDia[dia][clave]++;\n  if (!porDiaAsesor[dia]) porDiaAsesor[dia] = {};\n  porDiaAsesor[dia][uid] = (porDiaAsesor[dia][uid] || 0) + (clave === 'citas' ? 0 : 1);\n}\n\nfor (const u of objetivo) {\n  const acc = { agent_id: u.id, nombre: u.name, wa: 0, notas: 0, tareas: 0, citas_programadas: 0, citas_cumplidas: 0, total: 0 };\n  porAsesor[u.id] = acc;\n\n  const qp = [];\n  const add = (k, v) => qp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));\n  Object.keys(TIPOS).forEach((t, i) => add(`filter[type][${i}]`, t));\n  add('filter[created_by][0]', u.id);\n  add('filter[created_at][from]', fromTs);\n  add('filter[created_at][to]', toTs);\n  add('limit', '100');\n\n  let url = `${base}/events?${qp.join('&')}`;\n  let guard = 0;\n  while (url && guard < 60) {\n    const r = await httpGet(url);\n    for (const e of ((r._embedded && r._embedded.events) || [])) {\n      const clave = TIPOS[e.type];\n      if (!clave) continue;\n      acc[clave]++;\n      acc.total++;\n      sumarDia(diaLocal(e.created_at), u.id, clave);\n    }\n    url = (r._links && r._links.next && r._links.next.href) || null;\n    guard++;\n  }\n}\n\n// Citas = tareas de tipo \"Reunion\" (en esta cuenta: task_type 2) cuya fecha limite cae en el periodo.\n// El filtro de fechas de /tasks no existe para complete_till, asi que se trae el tipo completo (pocas) y se filtra aqui.\nconst tipoCita = conf.tarea_tipo_cita != null ? conf.tarea_tipo_cita : 2;\nlet tareas = [];\nlet urlT = `${base}/tasks?filter[task_type][]=${tipoCita}&limit=250`;\nlet guardT = 0;\nwhile (urlT && guardT < 20) {\n  const r = await httpGet(urlT);\n  tareas = tareas.concat((r._embedded && r._embedded.tasks) || []);\n  urlT = (r._links && r._links.next && r._links.next.href) || null;\n  guardT++;\n}\nfor (const t of tareas) {\n  if (!t.complete_till || t.complete_till < fromTs || t.complete_till > toTs) continue;\n  const acc = porAsesor[t.responsible_user_id];\n  if (!acc) continue;\n  acc.citas_programadas++;\n  if (t.is_completed) acc.citas_cumplidas++;\n  sumarDia(diaLocal(t.complete_till), t.responsible_user_id, 'citas');\n}\n\nreturn [{ json: {\n  periodo: { from: body.date_from, to: body.date_to },\n  por_asesor: porAsesor,\n  por_dia: Object.values(porDia).sort((a, b) => a.fecha.localeCompare(b.fecha)),\n  por_dia_asesor: porDiaAsesor,\n  nota_metodologica: 'WhatsApp = mensajes salientes enviados por una persona desde Kommo (los del bot y las automatizaciones no cuentan; lo que se escribe desde el telefono fuera de Kommo tampoco aparece). Notas = notas escritas en el lead/contacto. Tareas = tareas completadas. Citas = tareas de tipo Reunion con fecha dentro del periodo (la cumplida es la que se marco como completada). Una cita cumplida tambien suma como tarea completada, por eso el total del dia no incluye las citas.',\n}}];\n"
+   }
+  },
+  {
+   "id": "9fc42558-9760-4038-bc14-81f126484aa2",
+   "name": "Calcular Asesores",
+   "type": "n8n-nodes-base.code",
+   "typeVersion": 2,
+   "position": [
+    -2992,
+    20900
+   ],
+   "parameters": {
+    "jsCode": "// INDEMO · leads por asesora + atencion (gerente de ventas, indicadores base de Manu).\n// Dos modos (body.modo):\n//  'ia'       = lo que la IA (Valentina, SOLO redes sociales) delega: primera vez que un lead entra a CALIFICADO del embudo REDES SOCIALES.\n//               El cambio de etapa hecho por el sistema (created_by = 0) cuenta como \"delegado por la IA\". Se mide cuanto tardan las asesoras en tocarlo.\n//  'asesoras' = leads NUEVOS de los embudos CDMX y MTY (sin IA): todo corresponde a las asesoras. Se excluyen los que pasaron por el embudo de la IA.\nconst body = $('Webhook3').first().json.body;\nconst cfg = $('Config4').first().json;\nconst conf = $('Config Mapeo2').first().json;\nconst mapeo = conf.embudos;\n\nif (!body || body.type !== 'leads' || body.view !== 'advisors') {\n  throw new Error(`Se esperaba type=\"leads\" y view=\"advisors\" pero llego type=\"${body && body.type}\", view=\"${body && body.view}\".`);\n}\nif (!body.date_from || !body.date_to) {\n  throw new Error('Faltan date_from/date_to en la solicitud.');\n}\nconst MODO = body.modo === 'asesoras' ? 'asesoras' : 'ia';\n\n// Horario laboral (configurable en Config Mapeo2). Por omision: lunes a viernes 9:00-18:00, hora de Ciudad de Mexico (UTC-6 fijo).\nconst HOR = conf.horario || { tz: -6, ini: 9, fin: 18, dias: [1, 2, 3, 4, 5] };\nconst TZ_OFFSET_SECONDS = HOR.tz * 3600;\nconst DAY_SECONDS = 86400;\nfunction businessSecondsBetween(startTs, endTs) {\n  if (endTs == null || startTs == null || endTs <= startTs) return 0;\n  const localStart = startTs + TZ_OFFSET_SECONDS;\n  const localEnd = endTs + TZ_OFFSET_SECONDS;\n  let dayCursor = Math.floor(localStart / DAY_SECONDS) * DAY_SECONDS;\n  let total = 0;\n  let guard = 0;\n  while (dayCursor < localEnd && guard < 3660) {\n    const dow = new Date(dayCursor * 1000).getUTCDay();\n    if (HOR.dias.includes(dow)) {\n      const bizOpen = dayCursor + HOR.ini * 3600;\n      const bizClose = dayCursor + HOR.fin * 3600;\n      const overlapStart = Math.max(localStart, bizOpen);\n      const overlapEnd = Math.min(localEnd, bizClose);\n      if (overlapEnd > overlapStart) total += (overlapEnd - overlapStart);\n    }\n    dayCursor += DAY_SECONDS;\n    guard++;\n  }\n  return total;\n}\n\nconst tzTxt = (HOR.tz < 0 ? '-' : '+') + String(Math.abs(HOR.tz)).padStart(2, '0') + ':00';\nconst toStart = (d) => Math.floor(new Date(`${d}T00:00:00${tzTxt}`).getTime() / 1000);\nconst toEnd = (d) => Math.floor(new Date(`${d}T23:59:59${tzTxt}`).getTime() / 1000);\nconst fromTs = toStart(body.date_from);\nconst toTs = toEnd(body.date_to);\nconst ahora = Math.floor(Date.now() / 1000);\nconst LOOKBACK = (conf.lookback_dias || 180) * DAY_SECONDS;\nconst UMBRAL = (conf.umbral_sin_atender_horas || 24) * 3600;\nconst MAX_ATENCION = 1000;   // tope de leads a los que se les revisa la atencion (cada 10 leads = 2 peticiones a Kommo)\nconst CONCURRENCIA = 3;      // Kommo limita ~7 peticiones por segundo y el token se comparte con el agente de la cuenta\n\nconst headers = { Authorization: `Bearer ${cfg.kommo_token}`, 'Content-Type': 'application/json' };\nconst base = `https://${cfg.kommo_subdomain}.kommo.com/api/v4`;\nconst dormir = (ms) => new Promise((r) => setTimeout(r, ms));\nconst httpGet = async (url) => {\n  for (let intento = 0; ; intento++) {\n    try {\n      let resp = await this.helpers.httpRequest({ method: 'GET', url, headers, json: true });\n      // Kommo regresa 204 sin cuerpo cuando no hay resultados.\n      if (!resp || typeof resp !== 'object') resp = {};\n      return resp;\n    } catch (e) {\n      const txt = String((e && e.message) || '');\n      const reintentable = txt.includes('429') || (e && (e.httpCode == 429 || e.statusCode == 429)) || /ECONNRESET|ETIMEDOUT|socket hang up/i.test(txt);\n      if (!reintentable || intento >= 4) throw e;\n      await dormir(1500 * (intento + 1));\n    }\n  }\n};\nconst paginar = async (url, clave, tope) => {\n  const out = [];\n  let u = url;\n  let g = 0;\n  while (u && g < tope) {\n    const r = await httpGet(u);\n    out.push(...((r._embedded && r._embedded[clave]) || []));\n    u = (r._links && r._links.next && r._links.next.href) || null;\n    g++;\n  }\n  return out;\n};\nconst agregar = (qp) => (k, v) => qp.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));\n// Corre fn sobre cada elemento con a lo mas n peticiones a la vez\nconst enParalelo = async (items, n, fn) => {\n  let i = 0;\n  const trabajadores = Array.from({ length: Math.min(n, items.length) }, async () => {\n    while (i < items.length) { const k = i++; await fn(items[k], k); }\n  });\n  await Promise.all(trabajadores);\n};\n\n// Canales (por etiqueta del lead; la primera coincidencia gana)\nconst canalesCfg = conf.canales || [];\nconst nombreCanal = { sin_canal: 'Sin etiqueta de canal' };\ncanalesCfg.forEach(c => { nombreCanal[c.clave] = c.nombre; });\nfunction canalDeLead(lead) {\n  const tags = ((lead._embedded && lead._embedded.tags) || []).map(t => String(t.name));\n  const bajas = tags.map(t => t.toLowerCase());\n  for (const c of canalesCfg) {\n    const nombres = (c.etiquetas || []).map(x => String(x).toLowerCase());\n    const pats = (c.patrones || []).map(p => new RegExp(p, 'i'));\n    if (bajas.some(t => nombres.includes(t)) || tags.some(t => pats.some(re => re.test(t)))) return c.clave;\n  }\n  return 'sin_canal';\n}\n\n// Filtros del dashboard\nconst pipelineIds = (body.pipeline_ids || []).map(Number);\nconst agentIds = (body.agent_ids || []).map(Number);\nconst tagFilterSet = (body.tag_ids && body.tag_ids.length) ? new Set(body.tag_ids.map(Number)) : null;\nconst excluidos = (conf.usuarios_excluidos || []).map(Number);\nconst claveDe = {};\nfor (const [k, m] of Object.entries(mapeo)) claveDe[m.pipeline_id] = k;\nconst clavesIA = Object.entries(mapeo).filter(([k, m]) => m.rol === 'ia').map(([k]) => k);\nconst clavesAs = Object.entries(mapeo).filter(([k, m]) => m.rol !== 'ia').map(([k]) => k);\n// En el modo asesoras se cuentan los embudos elegidos (o todos los de asesoras si no se eligio ninguno de ellos)\nlet selAs = clavesAs.filter(k => !pipelineIds.length || pipelineIds.includes(Number(mapeo[k].pipeline_id)));\nif (!selAs.length) selAs = clavesAs.slice();\n\n// Usuarios: \"persona\" = cualquiera que no sea un usuario excluido (el bot y las automatizaciones salen con created_by = 0)\nconst users = await paginar(`${base}/users?limit=250`, 'users', 3);\nconst nombreUsuario = {};\nusers.forEach(u => { nombreUsuario[u.id] = u.name; });\nconst personas = users.map(u => Number(u.id)).filter(id => !excluidos.includes(id));\n\n// Posiciones de etapa, nombres y etapas de entrada\nconst posDe = {};\nconst nombreEtapaDe = {};\nconst calientesDe = {};\nfor (const m of Object.values(mapeo)) {\n  posDe[m.pipeline_id] = {};\n  (m.stage_order || []).forEach((sid, i) => { posDe[m.pipeline_id][sid] = i; });\n  nombreEtapaDe[m.pipeline_id] = {};\n  calientesDe[m.pipeline_id] = new Set((m.calientes || []).map(s => s.id));\n  (m.calientes || []).forEach(s => { nombreEtapaDe[m.pipeline_id][s.id] = s.nombre; });\n  Object.entries(m.nombres_etapas || {}).forEach(([sid, nom]) => { if (!nombreEtapaDe[m.pipeline_id][sid]) nombreEtapaDe[m.pipeline_id][sid] = nom; });\n}\nconst abiertoEnEntrada = (pid, sid) => calientesDe[pid] && calientesDe[pid].has(sid);\n\n// Pares (embudo, etapa) a vigilar en el historial\nconst entradasIA = new Set();      // CALIFICADO (+ inscrito) del embudo de la IA: de aqui sale la cohorte del modo 'ia'\nconst paresRedes = [];             // cualquier etapa del embudo de la IA (para saber que leads paso por ella)\nfor (const k of clavesIA) {\n  const m = mapeo[k];\n  (m.calientes || []).forEach(s => entradasIA.add(m.pipeline_id + '/' + s.id));\n  (m.ganado_ids || []).forEach(sid => entradasIA.add(m.pipeline_id + '/' + sid));\n  const todas = new Set([...(m.stage_order || []), ...(m.ganado_ids || []), ...(m.perdido_ids || [])]);\n  todas.forEach(sid => paresRedes.push({ p: m.pipeline_id, s: sid }));\n}\n// Avance (de \"programa de interes\" en adelante, mas inscrito) de los embudos de asesoras\nconst paresProgreso = (claves) => {\n  const out = [];\n  for (const k of claves) {\n    const m = mapeo[k];\n    const desde = m.efectivo != null && posDe[m.pipeline_id][m.efectivo] != null ? posDe[m.pipeline_id][m.efectivo] : 0;\n    const ids = new Set([...(m.stage_order || []).slice(desde), ...(m.ganado_ids || [])]);\n    ids.forEach(sid => out.push({ p: m.pipeline_id, s: sid }));\n  }\n  return out;\n};\nconst eventosEntrada = async (pares, desdeTs, hastaTs) => {\n  const qe = [];\n  const ae = agregar(qe);\n  ae('filter[type][0]', 'lead_status_changed');\n  ae('filter[created_at][from]', desdeTs);\n  ae('filter[created_at][to]', hastaTs);\n  pares.forEach((o, i) => {\n    ae(`filter[value_after][leads_statuses][${i}][pipeline_id]`, o.p);\n    ae(`filter[value_after][leads_statuses][${i}][status_id]`, o.s);\n  });\n  ae('limit', '100');\n  return paginar(`${base}/events?${qe.join('&')}`, 'events', 100);\n};\nconst registrarAvance = (maxPosEv, eventos) => {\n  for (const e of eventos) {\n    const id = e.entity_id;\n    if (id == null) continue;\n    const d = e.value_after && e.value_after[0] && e.value_after[0].lead_status;\n    const pos = (d && posDe[d.pipeline_id]) ? posDe[d.pipeline_id][d.id] : null;\n    if (pos != null && (maxPosEv[id] == null || pos > maxPosEv[id])) maxPosEv[id] = pos;\n  }\n};\n\n// 1) Cohorte de leads\nconst entrada = {};      // lead_id -> { ts, by }\nconst maxPosEv = {};     // lead_id -> posicion mas avanzada alcanzada (segun historial)\nlet nuevosCuenta = 0;\nlet excluidosPorIA = 0;\nlet cohorteLeads = [];\n\nconst qWith = ['tags', 'contacts', 'loss_reason'];\nif (MODO === 'ia') {\n  // Leads que pasaron por el embudo de la IA y la PRIMERA vez que llegaron a CALIFICADO\n  const evR = await eventosEntrada(paresRedes, fromTs - LOOKBACK, toTs);\n  const primeraRecibido = {};\n  const primeraEntrada = {};\n  for (const e of evR) {\n    const id = e.entity_id;\n    if (id == null) continue;\n    const d = e.value_after && e.value_after[0] && e.value_after[0].lead_status;\n    if (!primeraRecibido[id] || e.created_at < primeraRecibido[id]) primeraRecibido[id] = e.created_at;\n    if (d && entradasIA.has(d.pipeline_id + '/' + d.id)) {\n      if (!primeraEntrada[id] || e.created_at < primeraEntrada[id].ts) primeraEntrada[id] = { ts: e.created_at, by: e.created_by || 0 };\n    }\n  }\n  // Leads creados en el periodo directamente en el embudo de la IA\n  const qn = [];\n  const an = agregar(qn);\n  an('limit', '250');\n  an('filter[created_at][from]', fromTs);\n  an('filter[created_at][to]', toTs);\n  clavesIA.forEach(k => an('filter[pipeline_id][]', mapeo[k].pipeline_id));\n  const nuevosRedes = await paginar(`${base}/leads?${qn.join('&')}`, 'leads', 60);\n  const recibidos = new Set();\n  for (const [id, ts] of Object.entries(primeraRecibido)) { if (ts >= fromTs && ts <= toTs) recibidos.add(String(id)); }\n  nuevosRedes.forEach(l => recibidos.add(String(l.id)));\n  nuevosCuenta = recibidos.size;\n\n  for (const [id, v] of Object.entries(primeraEntrada)) { if (v.ts >= fromTs && v.ts <= toTs) entrada[id] = v; }\n  for (const l of nuevosRedes) {\n    if (!primeraEntrada[l.id] && abiertoEnEntrada(l.pipeline_id, l.status_id)) entrada[l.id] = { ts: l.created_at, by: l.created_by || 0 };\n  }\n  const idsCohorte = Object.keys(entrada);\n  await enParalelo(Array.from({ length: Math.ceil(idsCohorte.length / 100) }, (_, i) => idsCohorte.slice(i * 100, i * 100 + 100)), CONCURRENCIA, async (lote) => {\n    const q = ['limit=250', 'with=' + encodeURIComponent(qWith.join(','))];\n    lote.forEach((id, k) => q.push(`filter%5Bid%5D%5B${k}%5D=${id}`));\n    const r = await httpGet(`${base}/leads?${q.join('&')}`);\n    cohorteLeads.push(...((r._embedded && r._embedded.leads) || []));\n  });\n  cohorteLeads = cohorteLeads.filter(l => !!claveDe[l.pipeline_id]);\n  // Avance de los delegados dentro de CDMX / MTY (cita, proceso de pago, inscrito)\n  if (idsCohorte.length) {\n    const minTs = Math.min(...idsCohorte.map(id => entrada[id].ts));\n    registrarAvance(maxPosEv, await eventosEntrada(paresProgreso(clavesAs), minTs, toTs));\n  }\n} else {\n  // Leads nuevos de los embudos de asesoras, sin los que pasaron por la IA\n  const evR = await eventosEntrada(paresRedes, fromTs, toTs);\n  const viaIA = new Set(evR.map(e => String(e.entity_id)));\n  const qn = [];\n  const an = agregar(qn);\n  an('limit', '250');\n  an('with', qWith.join(','));\n  an('filter[created_at][from]', fromTs);\n  an('filter[created_at][to]', toTs);\n  selAs.forEach(k => an('filter[pipeline_id][]', mapeo[k].pipeline_id));\n  const nuevos = await paginar(`${base}/leads?${qn.join('&')}`, 'leads', 60);\n  nuevosCuenta = nuevos.length;\n  for (const l of nuevos) {\n    if (viaIA.has(String(l.id))) { excluidosPorIA++; continue; }\n    if (!claveDe[l.pipeline_id]) continue;\n    cohorteLeads.push(l);\n    entrada[l.id] = { ts: l.created_at, by: l.created_by || 0 };\n  }\n  registrarAvance(maxPosEv, await eventosEntrada(paresProgreso(selAs), fromTs, toTs));\n}\nconst leadsExcluidos = new Set((conf.leads_excluidos || []).map(Number));   // leads de prueba del equipo (no son leads reales)\nconst cohorte = cohorteLeads.filter(l => !excluidos.includes(Number(l.responsible_user_id)) && !leadsExcluidos.has(Number(l.id))\n  && (!agentIds.length || agentIds.includes(Number(l.responsible_user_id)))\n  && (!tagFilterSet || ((l._embedded && l._embedded.tags) || []).some(t => tagFilterSet.has(Number(t.id)))));\n\n// 2) Avance de cada lead (embudo donde esta HOY, asesora responsable y canal)\nconst porEmbudo = {};\nconst llavesEmbudo = MODO === 'ia' ? Object.keys(mapeo) : selAs;\nfor (const key of llavesEmbudo) {\n  const m = mapeo[key];\n  porEmbudo[key] = { embudo: key, pipeline_id: m.pipeline_id, llegaron: 0, delegados_ia: 0, propios: 0, cita: 0, docs: 0, ganado: 0, perdido: 0, monto_ganado: 0, motivos_perdida: {} };\n}\nconst porAsesor = {};\nconst porCanal = {};\nconst registros = [];\nfor (const l of cohorte) {\n  const key = claveDe[l.pipeline_id];\n  const m = mapeo[key];\n  const e = porEmbudo[key] || (porEmbudo[key] = { embudo: key, pipeline_id: m.pipeline_id, llegaron: 0, delegados_ia: 0, propios: 0, cita: 0, docs: 0, ganado: 0, perdido: 0, monto_ganado: 0, motivos_perdida: {} });\n  const ent = entrada[l.id];\n  const porIA = MODO === 'ia' && ent.by === 0;\n  const ganado = (m.ganado_ids || []).includes(l.status_id);\n  const perdido = (m.perdido_ids || []).includes(l.status_id);\n  const pos = posDe[m.pipeline_id][l.status_id];\n  const maxPos = Math.max(maxPosEv[l.id] != null ? maxPosEv[l.id] : -1, pos != null ? pos : -1);\n  const posCita = m.calificado != null ? posDe[m.pipeline_id][m.calificado] : null;\n  const posDocs = m.cotizacion != null ? posDe[m.pipeline_id][m.cotizacion] : null;\n  const llegoCita = ganado || (posCita != null && maxPos >= posCita);\n  const llegoDocs = ganado || (posDocs != null && maxPos >= posDocs);\n  const uid = l.responsible_user_id || 0;\n\n  e.llegaron++;\n  if (porIA) e.delegados_ia++; else e.propios++;\n  if (llegoCita) e.cita++;\n  if (llegoDocs) e.docs++;\n  if (ganado) { e.ganado++; e.monto_ganado += (l.price || 0); }\n  if (perdido) {\n    e.perdido++;\n    const motivo = (l._embedded && l._embedded.loss_reason && l._embedded.loss_reason[0] && l._embedded.loss_reason[0].name) || 'Sin motivo registrado';\n    e.motivos_perdida[motivo] = (e.motivos_perdida[motivo] || 0) + 1;\n  }\n\n  const a = porAsesor[uid] || (porAsesor[uid] = {\n    agent_id: uid, nombre: nombreUsuario[uid] || ('Usuario ' + uid),\n    llegaron: 0, delegados_ia: 0, propios: 0, cita: 0, docs: 0, ganado: 0, perdido: 0,\n    atendidos: 0, sin_atender: 0, en_plazo: 0, fuera_de_hot: 0, seg_habiles: 0, seg_reales: 0, con_tiempo: 0,\n    contactados: 0, seg_contacto: 0,\n  });\n  a.llegaron++;\n  if (porIA) a.delegados_ia++; else a.propios++;\n  if (llegoCita) a.cita++;\n  if (llegoDocs) a.docs++;\n  if (ganado) a.ganado++;\n  if (perdido) a.perdido++;\n\n  const ck = canalDeLead(l);\n  const ch = porCanal[ck] || (porCanal[ck] = { clave: ck, nombre: nombreCanal[ck], leads: 0, citas: 0, inscritos: 0, monto: 0 });\n  ch.leads++;\n  if (llegoCita) ch.citas++;\n  if (ganado) { ch.inscritos++; ch.monto += (l.price || 0); }\n\n  registros.push({ l, key, ent, porIA, uid, ganado, perdido });\n}\n\n// 3) Atencion: despues de la entrega (IA) o de que el lead nace (asesoras), cuanto tarda una PERSONA en hacer algo\n//    (mensaje, llamada, nota, tarea completada o mover la etapa). Se separa el primer toque de cualquier tipo del primer mensaje/llamada.\nlet paraAtender = MODO === 'ia' ? registros.filter(r => r.porIA) : registros.slice();\nlet atencionOmitidos = 0;\nif (paraAtender.length > MAX_ATENCION) {\n  paraAtender.sort((x, y) => y.ent.ts - x.ent.ts);\n  atencionOmitidos = paraAtender.length - MAX_ATENCION;\n  paraAtender = paraAtender.slice(0, MAX_ATENCION);\n}\nconst accion = {};\nconst leadsDeContacto = {};\nconst contactoDeLead = {};\nfor (const r of paraAtender) {\n  const cs = (r.l._embedded && r.l._embedded.contacts) || [];\n  const principal = cs.find(c => c.is_main) || cs[0];\n  if (principal) { contactoDeLead[r.l.id] = principal.id; (leadsDeContacto[principal.id] = leadsDeContacto[principal.id] || []).push(r.l.id); }\n}\nconst marcar = (leadId, e) => { (accion[leadId] = accion[leadId] || []).push({ ts: e.created_at, by: e.created_by, tipo: e.type }); };\nif (paraAtender.length && personas.length) {\n  const minTs = Math.min(...paraAtender.map(r => r.ent.ts));\n  const comunes = (qp) => {\n    const a = agregar(qp);\n    personas.forEach((h, i) => a(`filter[created_by][${i}]`, h));\n    a('filter[created_at][from]', minTs);\n    a('limit', '100');\n    return a;\n  };\n  const tareas = [];\n  const idsLead = paraAtender.map(r => r.l.id);\n  for (let i = 0; i < idsLead.length; i += 10) tareas.push({ entidad: 'lead', ids: idsLead.slice(i, i + 10), tipos: ['common_note_added', 'task_completed', 'lead_status_changed'] });\n  const idsContacto = Object.keys(leadsDeContacto);\n  for (let i = 0; i < idsContacto.length; i += 10) tareas.push({ entidad: 'contact', ids: idsContacto.slice(i, i + 10), tipos: ['outgoing_chat_message', 'outgoing_call'] });\n  await enParalelo(tareas, CONCURRENCIA, async (t) => {\n    const qp = [];\n    const a = agregar(qp);\n    a('filter[entity]', t.entidad);\n    a('filter[entity_id]', t.ids.join(','));\n    t.tipos.forEach((tp, k) => a(`filter[type][${k}]`, tp));\n    comunes(qp);\n    const ev = await paginar(`${base}/events?${qp.join('&')}`, 'events', 10);\n    for (const e of ev) {\n      if (e.entity_type === 'lead') marcar(e.entity_id, e);\n      else for (const lid of (leadsDeContacto[e.entity_id] || [])) marcar(lid, e);\n    }\n  });\n}\n\nconst esMensaje = (x) => x.tipo === 'outgoing_chat_message' || x.tipo === 'outgoing_call';\nconst sinAtender = [];\nfor (const r of paraAtender) {\n  const acc = (accion[r.l.id] || []).filter(x => x.ts > r.ent.ts).sort((x, y) => x.ts - y.ts);\n  const primero = acc[0] || null;\n  const primerMensaje = acc.find(esMensaje) || null;\n  const a = porAsesor[r.uid];\n  if (primero) {\n    a.atendidos++;\n    a.con_tiempo++;\n    a.seg_habiles += businessSecondsBetween(r.ent.ts, primero.ts);\n    a.seg_reales += (primero.ts - r.ent.ts);\n    if (primerMensaje) { a.contactados++; a.seg_contacto += businessSecondsBetween(r.ent.ts, primerMensaje.ts); }\n  } else if (MODO === 'ia' ? !abiertoEnEntrada(r.l.pipeline_id, r.l.status_id) && !r.ganado : (r.ganado || r.perdido)) {\n    // IA: la IA lo delego y despues lo regreso a una etapa anterior o lo perdio sin que nadie lo tocara.\n    // Asesoras: el lead ya se cerro (inscrito o perdido) sin que ninguna persona lo tocara.\n    a.fuera_de_hot++;\n  } else if (ahora - r.ent.ts >= UMBRAL) {\n    a.sin_atender++;\n    sinAtender.push({\n      lead_id: r.l.id, lead: r.l.name || ('Lead ' + r.l.id), embudo: r.key,\n      etapa: (nombreEtapaDe[r.l.pipeline_id] || {})[r.l.status_id] || ('Etapa ' + r.l.status_id),\n      responsible_user_id: r.uid, entregado: r.ent.ts, otra_persona: false,\n      contacto_id: contactoDeLead[r.l.id] || null,\n    });\n  } else {\n    a.en_plazo++;\n  }\n}\n\n// Nombre del contacto (solo para la lista de \"sin atender\")\nsinAtender.sort((x, y) => x.entregado - y.entregado);\nconst visibles = sinAtender.slice(0, 200);\nconst idsNombres = [...new Set(visibles.map(s => s.contacto_id).filter(Boolean))];\nconst nombreContacto = {};\nawait enParalelo(Array.from({ length: Math.ceil(idsNombres.length / 100) }, (_, i) => idsNombres.slice(i * 100, i * 100 + 100)), CONCURRENCIA, async (lote) => {\n  const q = ['limit=250'];\n  lote.forEach((id, k) => q.push(`filter%5Bid%5D%5B${k}%5D=${id}`));\n  const r = await httpGet(`${base}/contacts?${q.join('&')}`);\n  for (const c of ((r._embedded && r._embedded.contacts) || [])) nombreContacto[c.id] = c.name;\n});\n\n// Historial de cada lead de la lista: que le paso y quien lo hizo (sin usuario = sistema/IA)\nconst historiales = {};\ntry {\n  const nombreEtapaGlobal = {};\n  const pl = await httpGet(`${base}/leads/pipelines`);\n  for (const pp of ((pl._embedded && pl._embedded.pipelines) || [])) {\n    for (const st of ((pp._embedded && pp._embedded.statuses) || [])) nombreEtapaGlobal[st.id] = String(st.name || '').trim();\n  }\n  Object.values(nombreEtapaDe).forEach(mm => Object.entries(mm).forEach(([sid, nom]) => { nombreEtapaGlobal[sid] = nom; }));\n  const MAX_EVENTOS = 30;\n  const porLead = {};\n  const lotes = [];\n  for (let i = 0; i < visibles.length; i += 10) lotes.push(visibles.slice(i, i + 10));\n  await enParalelo(lotes, CONCURRENCIA, async (lote) => {\n    const qh = [];\n    const ah = agregar(qh);\n    ah('filter[entity]', 'lead');\n    ah('filter[entity_id]', lote.map(s => s.lead_id).join(','));\n    ['lead_added', 'lead_status_changed', 'common_note_added', 'task_completed', 'entity_responsible_changed'].forEach((t, k) => ah(`filter[type][${k}]`, t));\n    ah('limit', '100');\n    const evh = await paginar(`${base}/events?${qh.join('&')}`, 'events', 6);\n    for (const e of evh) (porLead[e.entity_id] = porLead[e.entity_id] || []).push(e);\n  });\n  const quien = (id) => (!id ? 'Sistema (IA o automatizacion)' : (nombreUsuario[id] || ('Usuario ' + id)));\n  const etapaDe = (v) => { const d = v && v[0] && v[0].lead_status; return d ? (nombreEtapaGlobal[d.id] || ('Etapa ' + d.id)) : null; };\n  const usuarioDe = (v) => { const d = v && v[0] && v[0].responsible_user; return d ? quien(d.id) : null; };\n  for (const [lid, evs] of Object.entries(porLead)) {\n    evs.sort((x, y) => x.created_at - y.created_at);\n    const lista = evs.map(e => ({\n      ts: e.created_at, tipo: e.type, por: quien(e.created_by), persona: !!e.created_by,\n      de: e.type === 'lead_status_changed' ? etapaDe(e.value_before) : (e.type === 'entity_responsible_changed' ? usuarioDe(e.value_before) : null),\n      a: e.type === 'lead_status_changed' ? etapaDe(e.value_after) : (e.type === 'entity_responsible_changed' ? usuarioDe(e.value_after) : null),\n    }));\n    historiales[lid] = { historial: lista.slice(-MAX_EVENTOS), historial_omitidos: Math.max(0, lista.length - MAX_EVENTOS) };\n  }\n} catch (err) { /* sin historial: el reporte sigue funcionando */ }\nconst listaSinAtender = visibles.map(s => ({\n  lead_id: s.lead_id, nombre: (s.contacto_id && nombreContacto[s.contacto_id]) || s.lead, embudo: s.embudo, etapa: s.etapa,\n  responsible_user_id: s.responsible_user_id, entregado: s.entregado, otra_persona: s.otra_persona,\n  ...(historiales[s.lead_id] || { historial: [], historial_omitidos: 0 }),\n}));\n\nfor (const a of Object.values(porAsesor)) {\n  a.promedio_segundos_habiles = a.con_tiempo ? Math.round(a.seg_habiles / a.con_tiempo) : null;\n  a.promedio_segundos_reales = a.con_tiempo ? Math.round(a.seg_reales / a.con_tiempo) : null;\n  a.promedio_segundos_contacto = a.contactados ? Math.round(a.seg_contacto / a.contactados) : null;\n  delete a.seg_habiles; delete a.seg_reales; delete a.seg_contacto;\n}\n\nconst total = (campo) => Object.values(porAsesor).reduce((s, a) => s + (a[campo] || 0), 0);\nconst notaIA = 'Modo IA (redes sociales): un lead le toca a las asesoras cuando entra por primera vez a CALIFICADO del embudo REDES SOCIALES. Si el cambio de etapa lo hizo el sistema cuenta como delegado por la IA; si lo hizo una persona, como movido por una asesora. Atendido = alguien del equipo mando un WhatsApp, hizo una llamada, escribio una nota, completo una tarea o movio la etapa despues de la entrega (cualquier persona: en Indemo todo el equipo comparte pocos usuarios de Kommo). Sin atender = pasaron mas de ' + (UMBRAL / 3600) + ' h, sigue en CALIFICADO y nadie lo ha tocado. \"Ya no estan en CALIFICADO\" = la IA lo regreso a una etapa anterior o lo perdio sin que nadie lo tocara. \"Dónde están hoy\" cuenta la etapa y el embudo actuales de cada lead delegado (al avanzar pasan a CDMX o MTY).';\nconst notaAs = 'Modo asesoras (CDMX y MTY): se cuentan los leads CREADOS en el periodo en esos embudos; los que pasaron por el embudo de la IA (redes sociales) se excluyen y se ven en la otra pestaña. Atendido = alguien del equipo mando un WhatsApp, hizo una llamada, escribio una nota, completo una tarea o movio la etapa despues de que el lead nacio. Sin atender = pasaron mas de ' + (UMBRAL / 3600) + ' h y nadie lo ha tocado. \"Cerrados sin que nadie los tocara\" = ya estan en inscrito o perdido sin ninguna accion de una persona.';\nreturn [{ json: {\n  modo: MODO,\n  periodo: { from: body.date_from, to: body.date_to },\n  resumen_ia: {\n    leads_nuevos: nuevosCuenta,\n    delegados_ia: total('delegados_ia'),\n    movidos_por_asesores: total('propios'),\n    fuera_de_hot: total('fuera_de_hot'),\n    excluidos_por_ia: excluidosPorIA,\n    contactados: total('contactados'),\n  },\n  por_embudo: porEmbudo,\n  por_asesor: porAsesor,\n  por_canal: Object.values(porCanal).sort((a, b) => (b.inscritos - a.inscritos) || (b.leads - a.leads)),\n  sin_atender: listaSinAtender,\n  total_sin_atender: sinAtender.length,\n  atencion_omitidos: atencionOmitidos,\n  atencion_tope: MAX_ATENCION,\n  umbral_horas: UMBRAL / 3600,\n  zona_horas: TZ_OFFSET_SECONDS / 3600,\n  horario: { ini: HOR.ini, fin: HOR.fin, dias: HOR.dias },\n  nota_metodologica: MODO === 'ia' ? notaIA : notaAs,\n}}];\n"
+   }
+  }
+ ],
+ "connections": {
+  "Webhook3": {
+   "main": [
+    [
+     {
+      "node": "Config4",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config4": {
+   "main": [
+    [
+     {
+      "node": "Switch Tipo3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Switch Tipo3": {
+   "main": [
+    [
+     {
+      "node": "HTTP Pipelines3",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Config Mapeo2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "HTTP Pipelines3": {
+   "main": [
+    [
+     {
+      "node": "HTTP Tags3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "HTTP Tags3": {
+   "main": [
+    [
+     {
+      "node": "HTTP Users3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "HTTP Users3": {
+   "main": [
+    [
+     {
+      "node": "Code Format Scan3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Code Format Scan3": {
+   "main": [
+    [
+     {
+      "node": "Respond Scan3",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Config Mapeo2": {
+   "main": [
+    [
+     {
+      "node": "Switch Vista2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Reporte Performance2": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Switch Vista2": {
+   "main": [
+    [
+     {
+      "node": "Calcular Reporte Performance2",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Calcular Cross-tab Calificados2",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Calcular Tiempos de Respuesta2",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Calcular Leads Vivos1",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Calcular Actividades",
+      "type": "main",
+      "index": 0
+     }
+    ],
+    [
+     {
+      "node": "Calcular Asesores",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Cross-tab Calificados2": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Tiempos de Respuesta2": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Leads Vivos1": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Actividades": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  },
+  "Calcular Asesores": {
+   "main": [
+    [
+     {
+      "node": "Respond Leads2",
+      "type": "main",
+      "index": 0
+     }
+    ]
+   ]
+  }
+ },
+ "settings": {
+  "executionOrder": "v1"
+ }
+}
