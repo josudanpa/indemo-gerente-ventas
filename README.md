@@ -7,6 +7,7 @@ Tablero estático (un solo `index.html`, sin build) con los indicadores base que
   `aristoteles - indemo (gerente de ventas: redes con IA + asesoras CDMX/MTY)` (id `DIGzV82ogXDLYMlC`, instancia `digital-crew-n8n.xrzfaj.easypanel.host`).
 - **Webhook:** `https://digital-crew-n8n.xrzfaj.easypanel.host/webhook/GERENTE-VENTAS-INDEMO` (constante `WEBHOOK_URL` de `index.html`).
 - **Deploy:** `Dockerfile` (nginx:alpine), puerto 80. En EasyPanel: app desde este repo, rama `main`.
+- **Dirección:** https://indemo-aristoteles.digitalcrew.com.mx (también responde https://digital-crew-indemo-gerente-ventas.xrzfaj.easypanel.host).
 - `flujo-n8n-gerente-ventas-indemo.json`: respaldo del flujo **sin el token de Kommo** (reemplazar `TOKEN_DE_KOMMO` en el nodo `Config4` si se importa).
 
 ## Dos secciones, cargadas juntas (sin botón de cambio)
