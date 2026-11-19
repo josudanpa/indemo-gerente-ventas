@@ -1,4 +1,24 @@
-# Gerente de ventas · INDEMO
+# Aristóteles · INDEMO (formato homologado)
+
+Desde el 19-nov-2026 este tablero es la **misma página que el Aristóteles de Digital Crew** (`josudanpa/gerente-comercial`, iterada por Manu el 18 y 19-nov:
+Loom «Homologación de reportes y KPI comerciales»), con los datos de Indemo. Pestañas: Leads recibidos · Ejecución comercial · Oportunidades · Ventas ·
+Comparativos · **Asignación y atención de leads con IA** (solo Indemo, porque tiene IA en redes sociales).
+
+- **Datos:** flujo n8n `aristoteles v3 - indemo (formato homologado de Manu)` (id `DU609P1KZy4iQETy`), copia del flujo `aristoteles` de Digital Crew
+  (`Vb7kSvAla7RJxMNu`, que no se toca) con la cuenta `graceindemocommx` y el mapeo de embudos de Indemo. Webhook `/webhook/GERENTE-VENTAS-INDEMO-V3`.
+- **Pestaña de la IA:** lee el flujo anterior de Indemo (`DIGzV82ogXDLYMlC`, webhook `GERENTE-VENTAS-INDEMO`, vista `advisors` modo `ia`).
+- **Cómo se genera:** `indemo-gerente-build/clonar_v3_indemo.js --actualizar` (flujo) y `indemo-gerente-build/html_v3_indemo.js` (página, a partir de
+  `ref-manu/index_manu.html`). Cuando Manu cambie su página o su flujo, se vuelve a bajar su `index.html` y se corren los dos scripts.
+- **Lo que cambia contra la de Digital Crew:** cuenta y webhook; contacto efectivo = etapa `efectivo` del mapeo (Programa de interés en CDMX y MTY,
+  Prospección en redes); seguimiento y protocolo auditan CDMX y MTY; leads vivos sin «CDMX Reactivación comercial»; etiquetas de campaña de Indemo
+  (META, INSTAGRAM/INST, formularios fb…, LANDING PAGE, LANDING MILÁN/MILAN, PÁGINA WEB, Form); sin metas de Digital Crew; sin pantalla de acceso;
+  protocolo de seguimiento oculto (Manu pidió omitirlo por ahora).
+- **Deploy:** `Dockerfile` (nginx:alpine con Cache-Control no-cache), servicio EasyPanel `digital-crew/indemo-gerente-ventas`,
+  https://indemo-aristoteles.digitalcrew.com.mx
+
+---
+
+## Versión anterior (11 al 19-nov-2026)
 
 Tablero estático (un solo `index.html`, sin build) con los indicadores base que pidió Manu para Indemo
 (leads recibidos, leads calificados, tiempos de respuesta y cumplimiento de la atención), con la misma estructura del gerente de ventas de Gestalt.
