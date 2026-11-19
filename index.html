@@ -678,7 +678,7 @@
         <div class="panel-icon" id="iconIAEntrantes"></div>
         <div class="panel-title"><h2>Leads atendidos por la IA</h2><p class="panel-sub">De los leads que entran por redes sociales, cuántos asigna la IA a una asesora.</p></div>
       </div>
-      <p class="help">La IA (Valentina) atiende primero lo que entra por Instagram y Facebook y lo asigna a una asesora cuando el lead llega a CALIFICADO. Entrantes = leads nuevos de redes sociales en el periodo; asignados = los que la IA pasó a CALIFICADO en el periodo.</p>
+      <p class="help">La IA (Valentina) atiende primero lo que entra por Instagram y Facebook y lo asigna a una asesora cuando el lead llega a CALIFICADO. Entraron por redes sociales = leads que llegaron al embudo de redes en el periodo, aunque hoy ya estén en CDMX o MTY (por eso es más que la fila de redes sociales en «Conversión dentro del embudo», que cuenta a cada lead en el embudo donde está hoy). Asignados = los que la IA pasó a CALIFICADO en el periodo.</p>
       <div id="iaEntrantesStats"><div class="empty">Genera el reporte para ver este tablero.</div></div>
     </div>
     <div class="panel">
@@ -1959,7 +1959,7 @@ function renderLeadsEntrantesSemestre(datos) {
 
 function nombreAgente(id) {
   const found = agentsCatalog.find(a => String(a.id) === String(id));
-  return found ? found.name : `Usuario ${id}`;
+  return found ? found.name : (Number(id) === 0 ? 'Sin aceptar (Incoming leads)' : `Usuario ${id}`);   // INDEMO: responsable 0 = lead entrante que nadie ha aceptado en Kommo
 }
 function fmtMinSeg(segundos) {
   const t = Math.round(segundos);
@@ -2887,7 +2887,7 @@ async function cargarIA(filtros, desde, hasta) {
     const r = d.resumen_ia, ases = Object.values(d.por_asesor || {});
     const tasa = r.leads_nuevos ? Math.round(r.delegados_ia / r.leads_nuevos * 100) : null;
     st.innerHTML = '<div class="stats-row">' +
-      statCard('users', 'var(--ink-soft)', 'Leads entrantes', String(r.leads_nuevos), 'nuevos de redes sociales en el periodo') +
+      statCard('users', 'var(--ink-soft)', 'Entraron por redes sociales', String(r.leads_nuevos), 'en el periodo, incluidos los que ya pasaron a CDMX o MTY') +
       statCard('target', 'var(--c-positive)', 'Asignados por la IA', String(r.delegados_ia), 'pasaron a CALIFICADO en el periodo') +
       statCard('target', 'var(--ink-soft)', 'Tasa de asignación', tasa == null ? '–' : tasa + '%', 'asignados / entrantes') + '</div>';
     const sum = (k) => ases.reduce((s, a) => s + (a[k] || 0), 0);
