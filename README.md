@@ -22,6 +22,9 @@ Cada sección trae sus propios bloques: leads, desempeño y atención / tiempo d
 Entre las dos secciones van los bloques compartidos de todos los embudos: inscritos con comparativo, canales (nuevos de CDMX/MTY más delegados por la IA), el listado de **leads calificados** (CALIFICADO en redes; de cita en campus a inicio de proceso de pago en CDMX y MTY, con exportar a CSV) y la actividad diaria. Sin tablas de «oportunidades calientes» ni de «leads vivos» y sin «JSON crudo» (se quitaron el 11-nov a pedido de Josué).
 Si en los filtros se eligen embudos, cada sección solo aparece si incluye alguno de los suyos. **Inscritos** y su comparativo cuentan todos los embudos (un lead que la IA delega se inscribe ya en CDMX o MTY).
 
+## Formato homologado (iteración 4, 19-nov-2026)
+Pedido de Manu (Loom «Homologación de reportes y KPI comerciales»): pestañas Leads recibidos · Ejecución comercial · Oportunidades · Ventas · Comparativos · Asignación y atención de leads con IA, y filtros ocultos tras el botón «Filtros». Tableros nuevos: Leads vivos (vista `live_leads`), Seguimiento en la primera semana (5 toques en 7 días), Leads recibidos por mes (6 meses) y Entrantes vs asignados por la IA (vista nueva `homologado`, nodo «Calcular Homologado»). Generador: `indemo-gerente-build/fase_iteracion4.js` (correr `html_indemo.js` con `ORIGEN` = `skills/aristoteles-gerente-ventas/base/index_cancun.html`). Es una versión intermedia: el formato final es el del `gerente-comercial` de Digital Crew que iteró Manu.
+
 ## Cómo se define cada cosa
 | Qué | Dónde |
 |---|---|

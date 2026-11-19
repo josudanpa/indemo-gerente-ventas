@@ -308,6 +308,18 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   }
+
+  /* ---------- Iteracion 4 (19-nov-2026): formato homologado de Aristoteles ---------- */
+  .tabs { display: flex; gap: 4px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; margin: 0 0 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 5; background: var(--bg); padding-top: 6px; }
+  .tab { flex: 0 0 auto; font: 600 13px var(--body); color: var(--ink-soft); background: none; border: none; padding: 10px 14px 11px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+  .tab-pane[hidden] { display: none; }
+  .btn-sec { display: inline-flex; align-items: center; gap: 6px; font: 600 13px var(--body); color: var(--ink); background: var(--surface-2, var(--surface)); border: 1px solid var(--border); border-radius: 999px; padding: 9px 16px; cursor: pointer; margin-left: 8px; }
+  .btn-sec:hover { border-color: var(--ink-soft); }
+  .btn-sec[aria-expanded="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .filtros-avanzados[hidden] { display: none; }
+  .sub-h3 { font-family: var(--display); font-size: 13px; color: var(--ink-soft); font-weight: 600; margin: 18px 0 6px; }
 </style>
 </head>
 <body>
@@ -982,6 +994,7 @@ els.btnGenerar.addEventListener('click', async () => {
 
     // Inscritos contra el periodo anterior y contra el año anterior
     await cargarComparativoInscritos(filtros, desde, hasta, closedPayload);
+    await cargarHomologado(base, desde, hasta, advPayloads);
 
     const delegados = advPayloads.ia ? Object.values(advPayloads.ia.por_embudo || {}).reduce((s, e) => s + e.llegaron, 0) : 0;
     const nuevos = advPayloads.asesoras ? Object.values(advPayloads.asesoras.por_embudo || {}).reduce((s, e) => s + e.llegaron, 0) : 0;
@@ -1842,7 +1855,167 @@ function renderAtencion(payload) {
 }
 
 
+/* ============================== ITERACION 4: formato homologado (pestanas) ============================== */
+const KOMMO_VIVOS_NOTA = 'Foto de hoy: leads abiertos (no inscritos ni perdidos) en cada embudo. No depende de las fechas.';
+function crearPanel(id, titulo, ayuda) {
+  const d = document.createElement('div');
+  d.className = 'panel'; d.id = id;
+  d.innerHTML = '<div class="panel-head"><h2>' + titulo + '</h2></div><p class="help">' + ayuda + '</p><div id="' + id + 'Cuerpo"><div class="empty">Genera el reporte para ver este tablero.</div></div>';
+  return d;
+}
+function homologarPagina() {
+  const row = document.getElementById('resultsRow');
+  // ---- Filtros ocultos tras un boton ----
+  const btnGen = document.getElementById('btnGenerar');
+  const filtros = document.createElement('div');
+  filtros.id = 'filtrosAvanzados'; filtros.className = 'filtros-avanzados'; filtros.hidden = true;
+  ['pipelineChecks', 'agentChecks', 'tagChecks', 'calificadosToggle'].forEach(id => {
+    const e = document.getElementById(id);
+    const bloque = e && e.closest('div[style*="margin-top"]');
+    if (bloque) filtros.appendChild(bloque);
+  });
+  const filaFechas = document.getElementById('tFiltroAyuda');
+  filaFechas.after(filtros);
+  const btnF = document.createElement('button');
+  btnF.type = 'button'; btnF.className = 'btn-sec'; btnF.id = 'btnFiltros'; btnF.setAttribute('aria-expanded', 'false'); btnF.textContent = 'Filtros';
+  btnF.addEventListener('click', () => { const abierto = filtros.hidden; filtros.hidden = !abierto; btnF.setAttribute('aria-expanded', String(abierto)); });
+  btnGen.after(btnF);
+  filaFechas.style.display = 'none';
+
+  // ---- Pestanas ----
+  const DEF = [['recibidos', 'Leads recibidos'], ['ejecucion', 'Ejecución comercial'], ['oportunidades', 'Oportunidades'], ['ventas', 'Ventas'], ['comparativos', 'Comparativos'], ['ia', 'Asignación y atención de leads con IA']];
+  const nav = document.createElement('nav');
+  nav.className = 'tabs'; nav.setAttribute('role', 'tablist'); nav.setAttribute('aria-label', 'Secciones del reporte');
+  nav.innerHTML = DEF.map(([k, t], i) => '<button type="button" class="tab" role="tab" data-tab="' + k + '" aria-selected="' + (i === 0) + '">' + t + '</button>').join('');
+  const panes = {};
+  DEF.forEach(([k], i) => { const s = document.createElement('section'); s.className = 'tab-pane'; s.dataset.pane = k; s.setAttribute('role', 'tabpanel'); s.hidden = i !== 0; panes[k] = s; });
+  const mostrar = (k) => {
+    nav.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === k)));
+    Object.entries(panes).forEach(([n, p]) => { p.hidden = n !== k; });
+    try { localStorage.setItem('gerente_indemo_tab', k); } catch (e) { /* sin almacenamiento */ }
+  };
+  nav.addEventListener('click', ev => { const t = ev.target.closest('.tab'); if (t) mostrar(t.dataset.tab); });
+
+  const panel = (id) => { const e = document.getElementById(id); return e ? e.closest('.panel') : null; };
+  const poner = (k, el) => { if (el) panes[k].appendChild(el); };
+
+  const bAs = document.getElementById('bloqueAsesoras');
+  const bIA = document.getElementById('bloqueIA');
+  const panelVivos = crearPanel('panelVivos', 'Leads vivos en el embudo', KOMMO_VIVOS_NOTA + ' Si eliges embudos en «Filtros», solo se cuentan esos.');
+  const panelSeg = crearPanel('panelSeguimiento', 'Seguimiento en la primera semana', 'El protocolo pide 5 toques en los primeros 7 días de cada lead. Aquí se ve cuántos leads de CDMX y MTY lo cumplen, cuántos no llevan ni un solo toque y cuántos toques llevan por asesora.');
+  const panelMens = crearPanel('panelMensual', 'Leads recibidos por mes (últimos 6 meses)', 'Cuántos leads nacieron cada mes en cada embudo, para ver la tendencia. El mes en curso va incompleto.');
+  const panelEntr = crearPanel('panelEntrantesIA', 'Leads atendidos por la IA: entrantes vs asignados', 'De los leads que entran por redes sociales en el periodo, cuántos asignó la IA a una asesora y qué tasa representa.');
+
+  poner('recibidos', bAs.querySelector('.sec-head'));
+  poner('recibidos', panel('leadsPeriodoStatsAs'));
+  poner('recibidos', panelVivos);
+  poner('ejecucion', panel('atencionStatsAs'));
+  poner('ejecucion', panelSeg);
+  poner('ejecucion', document.getElementById('actividadPanel'));
+  poner('oportunidades', panel('resultsStatsAs'));
+  poner('oportunidades', panel('calificadosListaTable'));
+  poner('ventas', panel('ganadosStats'));
+  poner('ventas', panel('canalesStats'));
+  poner('comparativos', panelMens);
+  poner('ia', panelEntr);
+  poner('ia', bIA);
+
+  // el comparativo de inscritos (periodo anterior / año anterior) pasa a Comparativos
+  const comp = document.getElementById('inscritosComparativo');
+  if (comp) {
+    const prev = comp.previousElementSibling;
+    const caja = document.createElement('div'); caja.className = 'panel';
+    caja.innerHTML = '<div class="panel-head"><h2>Inscritos: este periodo contra el anterior y el año pasado</h2></div>';
+    if (prev && prev.tagName === 'H3') prev.remove();
+    caja.appendChild(comp);
+    panes.comparativos.appendChild(caja);
+  }
+  row.prepend(...[nav, ...Object.values(panes)]);
+  if (bAs) bAs.style.display = 'none';
+  try { const t = localStorage.getItem('gerente_indemo_tab'); if (t && panes[t]) mostrar(t); } catch (e) { /* nada */ }
+}
+
+function cuerpo(id) { return document.getElementById(id + 'Cuerpo'); }
+const nbonito = (n) => { const t = String(n).trim().replace(/\s+/g, ' '); return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase(); };
+function barra(valor, max) { return '<span class="meta-progress-track"><span class="meta-progress-fill" style="width:' + (max ? Math.min(100, Math.round(valor / max * 100)) : 0) + '%"></span></span>'; }
+
+function renderVivos(payload) {
+  const embudos = Object.values(payload.por_embudo || {});
+  const total = embudos.reduce((s, e) => s + (e.leads_vivos || 0), 0);
+  const bloque = (e) => {
+    const max = Math.max(1, ...e.por_etapa.map(s => s.leads));
+    const filas = e.por_etapa.map(s => '<tr><td>' + escH(nbonito(s.etapa)) + '</td><td class="num"><span class="numval">' + fmtNum(s.leads) + '</span></td><td style="width:38%">' + barra(s.leads, max) + '</td></tr>').join('');
+    return '<div style="flex:1; min-width:300px;"><h3 class="sub-h3" style="margin-top:6px;">' + escH(e.embudo) + ' · ' + fmtNum(e.leads_vivos) + ' vivos</h3>' +
+      '<div class="table-scroll"><table><thead><tr><th>Etapa</th><th class="num">Leads</th><th></th></tr></thead><tbody>' + filas + '</tbody></table></div></div>';
+  };
+  cuerpo('panelVivos').innerHTML = '<div class="stats-row">' + statCard('layers', 'var(--ink-soft)', 'Leads vivos', fmtNum(total), 'abiertos hoy') +
+    embudos.map(e => statCard('layers', 'var(--ink-soft)', e.embudo, fmtNum(e.leads_vivos))).join('') + '</div>' +
+    (embudos.length ? '<div style="display:flex; gap:22px; flex-wrap:wrap; margin-top:14px;">' + embudos.map(bloque).join('') + '</div>' : '<div class="empty">Sin leads vivos con estos filtros.</div>');
+}
+
+function renderSeguimiento(p) {
+  const s = p.seguimiento, t = s.totales;
+  const pct = (a, b) => b ? Math.round(a / b * 100) + ' %' : '–';
+  const maxD = Math.max(1, ...s.distribucion.map(d => d.leads));
+  const dist = s.distribucion.map(d => '<tr><td>' + d.toques + (d.toques === '1' ? ' toque' : ' toques') + '</td><td class="num"><span class="numval">' + fmtNum(d.leads) + '</span></td><td style="width:45%">' + barra(d.leads, maxD) + '</td></tr>').join('');
+  const ases = s.por_asesor.map(a => '<tr><td>' + escH(a.nombre) + '</td><td class="num">' + fmtNum(a.leads) + '</td><td class="num">' + fmtNum(a.maduros) + '</td><td class="num"><span class="numval">' + fmtNum(a.cumplen) + '</span> <span class="help">(' + pct(a.cumplen, a.maduros) + ')</span></td><td class="num"><span class="numval">' + fmtNum(a.cero) + '</span></td><td class="num">' + (a.leads ? (a.toques / a.leads).toFixed(1) : '–') + '</td><td class="num">' + fmtNum(a.llamadas) + '</td></tr>').join('');
+  const emb = s.por_embudo.map(a => '<tr><td>' + escH(a.embudo) + '</td><td class="num">' + fmtNum(a.leads) + '</td><td class="num">' + fmtNum(a.maduros) + '</td><td class="num"><span class="numval">' + fmtNum(a.cumplen) + '</span> <span class="help">(' + pct(a.cumplen, a.maduros) + ')</span></td><td class="num"><span class="numval">' + fmtNum(a.cero) + '</span></td></tr>').join('');
+  const sin = s.sin_toques.slice(0, 40).map(l => '<tr><td><a href="' + kommoLeadUrl(l.lead_id) + '" target="_blank" rel="noopener">' + escH(l.nombre) + '</a></td><td>' + escH(l.embudo) + '</td><td>' + escH(nbonito(l.etapa)) + '</td><td>' + escH(l.asesor) + '</td><td>' + new Date(l.creado * 1000).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) + '</td></tr>').join('');
+  cuerpo('panelSeguimiento').innerHTML =
+    '<div class="stats-row">' +
+      statCard('check', 'var(--ink-soft)', 'Leads revisados', fmtNum(t.leads), 'nacidos en el periodo en CDMX y MTY') +
+      statCard('check', 'var(--ink-soft)', 'Cumplen 5 toques en 7 días', fmtNum(t.cumplen), pct(t.cumplen, t.maduros) + ' de los ' + fmtNum(t.maduros) + ' con 7 días cumplidos') +
+      statCard('alert', 'var(--ink-soft)', 'Sin ningún toque', fmtNum(t.cero_toques), pct(t.cero_toques, t.maduros) + ' de los que ya cumplieron 7 días') +
+      statCard('layers', 'var(--ink-soft)', 'Promedio de toques', t.promedio_toques == null ? '–' : String(t.promedio_toques), 'por lead en su primera semana') +
+      statCard('layers', 'var(--ink-soft)', 'Llamadas registradas', fmtNum(t.llamadas), 'mensajes ' + fmtNum(t.mensajes) + ' · notas ' + fmtNum(t.notas)) +
+    '</div>' +
+    '<p class="help" style="margin-top:8px;">' + escH(s.criterio) + (t.en_ventana ? ' ' + fmtNum(t.en_ventana) + ' leads todavía están dentro de sus 7 días.' : '') + (s.truncado ? ' Se revisaron los ' + fmtNum(s.tope) + ' leads más recientes del periodo (hay más; acorta las fechas para ver todos).' : '') + ' Lo que se hace fuera de Kommo (WhatsApp personal, llamadas desde el celular) no aparece.</p>' +
+    '<div style="display:flex; gap:22px; flex-wrap:wrap; margin-top:10px;">' +
+      '<div style="flex:1; min-width:280px;"><h3 class="sub-h3">Cuántos toques llevan los leads</h3><div class="table-scroll"><table><thead><tr><th>Toques en 7 días</th><th class="num">Leads</th><th></th></tr></thead><tbody>' + dist + '</tbody></table></div></div>' +
+      '<div style="flex:1; min-width:280px;"><h3 class="sub-h3">Por embudo</h3><div class="table-scroll"><table><thead><tr><th>Embudo</th><th class="num">Leads</th><th class="num">Con 7 días</th><th class="num">Cumplen</th><th class="num">Sin toques</th></tr></thead><tbody>' + emb + '</tbody></table></div></div>' +
+    '</div>' +
+    '<h3 class="sub-h3">Por asesora</h3><div class="table-scroll"><table><thead><tr><th>Asesora</th><th class="num">Leads</th><th class="num">Con 7 días</th><th class="num">Cumplen 5 toques</th><th class="num">Sin toques</th><th class="num">Toques por lead</th><th class="num">Llamadas</th></tr></thead><tbody>' + ases + '</tbody></table></div>' +
+    '<h3 class="sub-h3">Leads con 7 días cumplidos y ningún toque (' + fmtNum(s.total_sin_toques) + ')</h3>' +
+    (sin ? '<div class="table-scroll"><table><thead><tr><th>Lead</th><th>Embudo</th><th>Etapa</th><th>Asesora</th><th>Nació</th></tr></thead><tbody>' + sin + '</tbody></table></div>' + (s.total_sin_toques > 40 ? '<p class="help">Se muestran los 40 más antiguos.</p>' : '') : '<div class="empty">No hay leads sin ningún toque. 👍</div>');
+}
+
+function renderMensual(p) {
+  const m = p.mensual, nom = (x) => { const [a, mo] = x.split('-'); return new Date(Date.UTC(+a, +mo - 1, 1)).toLocaleDateString('es-MX', { month: 'short', year: '2-digit', timeZone: 'UTC' }); };
+  const maxT = Math.max(1, ...m.total);
+  const filas = Object.values(m.por_embudo).map(e => '<tr><td>' + escH(e.embudo) + '</td>' + e.por_mes.map(v => '<td class="num">' + fmtNum(v) + '</td>').join('') + '</tr>').join('');
+  const tot = '<tr class="totales"><td>Total</td>' + m.total.map(v => '<td class="num"><span class="numval">' + fmtNum(v) + '</span></td>').join('') + '</tr>';
+  const barras = '<tr><td class="help">Volumen</td>' + m.total.map(v => '<td>' + barra(v, maxT) + '</td>').join('') + '</tr>';
+  cuerpo('panelMensual').innerHTML = '<div class="table-scroll"><table><thead><tr><th>Embudo</th>' + m.meses.map(x => '<th class="num">' + nom(x) + '</th>').join('') + '</tr></thead><tbody>' + filas + tot + barras + '</tbody></table></div>';
+}
+
+function renderEntrantesIA(p, advIA) {
+  const ent = p.ia_entrantes;
+  if (!ent) { cuerpo('panelEntrantesIA').innerHTML = '<div class="empty">Redes sociales no está incluido en los filtros.</div>'; return; }
+  const asig = advIA ? Object.values(advIA.por_embudo || {}).reduce((s, e) => s + (e.llegaron || 0), 0) : 0;
+  const tasa = ent.total ? Math.round(asig / ent.total * 100) : null;
+  const filas = ent.por_etapa_hoy.map(e => '<tr><td>' + escH(nbonito(e.etapa)) + '</td><td class="num"><span class="numval">' + fmtNum(e.leads) + '</span></td></tr>').join('');
+  cuerpo('panelEntrantesIA').innerHTML = '<div class="stats-row">' +
+    statCard('layers', 'var(--ink-soft)', 'Leads entrantes', fmtNum(ent.total), 'nacieron en redes sociales en el periodo') +
+    statCard('check', 'var(--ink-soft)', 'Asignados por la IA', fmtNum(asig), 'pasaron a CALIFICADO en el periodo') +
+    statCard('layers', 'var(--ink-soft)', 'Tasa de asignación', tasa == null ? '–' : tasa + ' %', 'asignados / entrantes') + '</div>' +
+    '<p class="help" style="margin-top:8px;">Se comparan los dos volúmenes del mismo periodo: los que entraron y los que la IA entregó a una asesora (esos pueden haber nacido antes, por eso la tasa es orientativa). Pendiente de afinar con Manu: tiempo ideal de contacto de 20 minutos y los cortes de 24 y 48 horas.</p>' +
+    '<h3 class="sub-h3">Dónde están hoy los entrantes del periodo</h3><div class="table-scroll"><table><thead><tr><th>Etapa</th><th class="num">Leads</th></tr></thead><tbody>' + filas + '</tbody></table></div>';
+}
+
+async function cargarHomologado(base, desde, hasta, advPayloads) {
+  const err = (id, e) => { const c = cuerpo(id); if (c) c.innerHTML = '<div class="empty">No se pudo cargar: ' + escH(e.message || e) + '</div>'; console.error(e); };
+  ['panelVivos', 'panelSeguimiento', 'panelMensual', 'panelEntrantesIA'].forEach(id => { const c = cuerpo(id); if (c) c.innerHTML = '<div class="empty">Cargando…</div>'; });
+  try { const v = await callWebhook({ ...base, view: 'live_leads' }, 'inicial'); renderVivos(extractPayload(v, 'por_embudo')); } catch (e) { err('panelVivos', e); }
+  try {
+    const hmg = extractPayload(await callWebhook({ ...base, view: 'homologado', date_from: desde, date_to: hasta }, 'inicial'), 'mensual');
+    try { renderSeguimiento(hmg); } catch (e) { err('panelSeguimiento', e); }
+    try { renderMensual(hmg); } catch (e) { err('panelMensual', e); }
+    try { renderEntrantesIA(hmg, advPayloads.ia); } catch (e) { err('panelEntrantesIA', e); }
+  } catch (e) { err('panelSeguimiento', e); err('panelMensual', e); err('panelEntrantesIA', e); }
+}
+
 prepararBloques();
+homologarPagina();
 aplicarTextosModo('ia', '');
 aplicarTextosModo('asesoras', 'As');
 aplicarTextosComunes();
