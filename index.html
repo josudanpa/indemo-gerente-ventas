@@ -523,7 +523,7 @@
         <div class="panel-icon" id="iconLeadsPeriodo"></div>
         <div class="panel-title"><h2>Leads recibidos de campañas por periodo</h2><p class="panel-sub">Mide que esté entrando el volumen de leads correctos.</p></div>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: por definir con Indemo</b><br>Cuántos leads de campañas se recibieron en el periodo, vistos de dos formas — por asesor y por embudo. Solo cuenta los leads que traen alguna etiqueta de campaña: META, INSTAGRAM / INST, formularios de Facebook (fb…), LANDING PAGE, LANDING MILÁN / MILAN, PÁGINA WEB o Form. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto.</p>
+      <p class="help"><b style="color:var(--ink-soft)">Objetivo: por definir con Indemo</b><br>Cuántos leads de campañas se recibieron en el periodo, vistos de dos formas — por asesor y por embudo. Solo cuenta los leads que traen alguna etiqueta de campaña: META, INSTAGRAM / INST, formularios de Facebook (fb…), LANDING PAGE, LANDING MILÁN / MILAN, PÁGINA WEB o Form. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto. Como solo cuenta leads de campaña, el total es menor que en «Tiempos de respuesta», que cuenta todos los leads que entran (también WhatsApp directo, OPENDAY, orgánicos o captura manual). «Sin asesor asignado» = leads que entraron y nadie ha tomado en Kommo.</p>
       <div id="leadsPeriodoStats"></div>
       <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:14px;">
         <div style="flex:1; min-width:260px;">
@@ -543,7 +543,7 @@
         <div class="panel-icon" id="iconLeadsVivos"></div>
         <div class="panel-title"><h2>Leads vivos en el embudo</h2><p class="panel-sub">Mide la capacidad instalada. Cada vendedor puede administrar 300 prospectos al mes.</p></div>
       </div>
-      <p class="help">Leads que están hoy en cualquier etapa activa de cada embudo — el mismo criterio del filtro "Leads activos" de Kommo: no cuenta los que están en Ganado ni en Perdido/Descalificado. Es una foto del momento actual (no depende del rango de fechas) y respeta el filtro de embudos, agentes y etiquetas de arriba. Los embudos Embudo global, Ejercicios de taller y Remarketing Edu están excluidos siempre de este tablero.</p>
+      <p class="help">Leads que están hoy en cualquier etapa activa de cada embudo — el mismo criterio del filtro "Leads activos" de Kommo: no cuenta los que están en Ganado ni en Perdido/Descalificado. Es una foto del momento actual (no depende del rango de fechas) y respeta el filtro de embudos, agentes y etiquetas de arriba. Queda fuera «CDMX Reactivación comercial», que es una base de reactivación y no un embudo de leads nuevos. «Sin asesor asignado» = leads que nadie ha tomado en Kommo; no es una asesora.</p>
       <div id="leadsVivosStats"></div>
       <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:14px;">
         <div style="flex:1; min-width:260px;">
@@ -555,7 +555,7 @@
           <div id="leadsVivosAsesorTable"></div>
         </div>
       </div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonLeadsVivos"></pre></details>
+      <pre id="rawJsonLeadsVivos" style="display:none !important;"></pre>
     </div>
     </section>
     <section class="tabpanel" role="tabpanel" id="tab-ejecucion" aria-labelledby="tabBtn-ejecucion" hidden>
@@ -564,13 +564,13 @@
         <div class="panel-icon" id="iconTiempos"></div>
         <div class="panel-title"><h2>Tiempos de respuesta a leads entrantes</h2><p class="panel-sub">Mide la rapidez del primer contacto. Un lead sin respuesta ágil se enfría y deja de responder.</p></div>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: -5 minutos</b><br>Por cada embudo, el promedio de tiempo entre la creación del lead y su primera atención: llamada saliente, nota nueva, mensaje saliente o conversación contestada (lo que ocurra primero, sobre el contacto del lead), contando solo horas dentro de horario laboral (lunes a viernes, 9:00-18:00, sin contar los días festivos oficiales de descanso obligatorio). No incluye los leads que un usuario creó a mano (no son entrantes) ni, por defecto, los de Embudo global; este último solo se incluye si lo seleccionas en el filtro de embudos.</p>
+      <p class="help"><b style="color:var(--ink-soft)">Objetivo: -5 minutos</b><br>Por cada embudo, el promedio de tiempo entre la creación del lead y su primera atención: llamada saliente, nota nueva, mensaje saliente o conversación contestada (lo que ocurra primero, sobre el contacto del lead), contando solo horas dentro de horario laboral (lunes a viernes, 9:00-18:00, sin contar los días festivos oficiales de descanso obligatorio). No incluye los leads que un usuario creó a mano (no son entrantes). Cuenta todos los leads que entran, traigan o no etiqueta de campaña; por eso el total es mayor que en «Leads recibidos de campañas». Los tiempos son en horario laboral: en horas de reloj (noches y fines de semana) son más.</p>
       <div id="respTimesStats"></div>
       <div id="respTimesComparativa"></div>
       <div id="respTimesTable"></div>
       <div id="respTimesFueraMeta"></div>
       <div class="help" id="respTimesNota" style="margin-top:10px;"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonRespTimes"></pre></details>
+      <pre id="rawJsonRespTimes" style="display:none !important;"></pre>
     </div>
     <div class="panel" id="protocoloPanel" style="display:none;">
       <div class="panel-head">
@@ -586,42 +586,42 @@
       <div id="cotizacionStats"></div>
       <div id="cotizacionTable"></div>
       <div class="help" id="protocoloNota" style="margin-top:10px;"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonProtocolo"></pre></details>
+      <pre id="rawJsonProtocolo" style="display:none !important;"></pre>
     </div>
     <div class="panel" id="semanaPanel">
       <div class="panel-head">
         <div class="panel-icon" id="iconSemana"></div>
-        <div class="panel-title"><h2>Seguimiento en la primera semana</h2><p class="panel-sub">Leads creados en el periodo · días en que se les volvió a escribir o llamar en sus primeros 10 días</p></div>
+        <div class="panel-title"><h2>Seguimiento en la primera semana</h2><p class="panel-sub">Leads creados en el periodo · días en que se les volvió a escribir o llamar en sus primeros 7 días</p></div>
       </div>
-      <p class="help">Cuenta cuántos días distintos se le volvió a escribir o llamar a cada lead durante sus primeros 10 días de vida. Un seguimiento es un día calendario distinto del día del primer contacto en el que un usuario (no un robot) envió al menos un mensaje saliente o hizo una llamada saliente; varios mensajes o llamadas el mismo día cuentan como uno. Los mensajes y llamadas se atribuyen por contacto (todos los contactos del lead) y por el propio lead. Solo se evalúa a los leads que ya cumplieron sus 10 días y que no se ganaron ni se perdieron dentro de ellos. Audita los embudos Web Edu/DC, Talleres de venta, Agentes de venta y Campañas publicitarias y respeta los filtros de embudos, agentes y etiquetas.</p>
+      <p class="help">Cuenta cuántos días distintos se le volvió a escribir o llamar a cada lead en sus primeros 7 días. Un seguimiento es un día, distinto al del primer contacto, en que una persona (no un robot) le mandó mensaje o le llamó; varios el mismo día cuentan como uno. Solo se evalúa a los leads que ya cumplieron sus 7 días y que no se inscribieron ni se perdieron en ellos; por eso «Leads evaluados» es menor que los leads del periodo (los más recientes todavía no cumplen la semana). Audita CDMX y Monterrey y respeta los filtros de arriba.</p>
       <div id="semanaStats"></div>
       <div class="semana-grid" id="semanaGrid" hidden>
-        <div><h3>Seguimientos en los primeros 10 días</h3><div id="semanaBars"></div></div>
+        <div><h3>Seguimientos en los primeros 7 días</h3><div id="semanaBars"></div></div>
         <div><h3>Cómo leerlo</h3><div class="semana-leer" id="semanaLeer"></div></div>
       </div>
       <div id="semanaTabla"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonSemana"></pre></details>
+      <pre id="rawJsonSemana" style="display:none !important;"></pre>
     </div>
     <div class="panel">
       <div class="panel-head">
         <div class="panel-icon" id="iconDesempeno"></div>
         <div class="panel-title"><h2>Conversión dentro del embudo</h2><p class="panel-sub">Mide la conversión en etapas clave del embudo.</p></div>
       </div>
-      <p class="help">Cuántos leads entraron, cuántos tuvieron contacto efectivo, cuántos llegaron a cotización/calificado, y cuántos se ganaron o se descalificaron. Contacto efectivo = lead entrante que pasó por la etapa Programa de interés (CDMX y MTY) o Prospección (redes sociales), o por cualquier etapa posterior (cita en campus, visita, clase muestra, proceso de pago, etc.), o que hoy está en una de ellas. Los ganados y descalificados cuentan solo si pasaron por alguna de esas etapas.</p>
+      <p class="help">Recibidos = leads creados en el periodo, en el embudo donde están hoy. Contacto efectivo = llegó a Programa de interés (CDMX y MTY) o Prospección (redes sociales), o más adelante. Visita agendada = llegó a Cita en campus o más adelante (visita, clase muestra, entrevista, horarios). Proceso de inscripción = llegó a Inicio de proceso de pago. Inscritos = Inscrito o Pago realizado. Cada columna incluye a los que ya avanzaron más. Perdidos = Venta perdida después de haber tenido contacto efectivo.</p>
       <div id="resultsStats"></div>
       <div id="resultsTable"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJson"></pre></details>
+      <pre id="rawJson" style="display:none !important;"></pre>
     </div>
     <div class="panel" id="callsPanel" style="display:none;">
       <div class="panel-head">
         <div class="panel-icon" id="iconLlamadas"></div>
         <h2>Volumen de llamadas por asesor</h2>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: 800 mensuales</b><br>Llamadas entrantes y salientes registradas en Kommo en el rango de fechas, agrupadas por quién realizó/registró la llamada vía Twilio.</p>
+      <p class="help">Se activa con la integración de llamadas (Twilio), que es un servicio adicional. Sin ella, aquí sale en cero.</p>
       <div id="callsStats"></div>
       <div id="callsTableCreador"></div>
       <div class="help" id="callsNota" style="margin-top:10px;"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonCalls"></pre></details>
+      <pre id="rawJsonCalls" style="display:none !important;"></pre>
     </div>
     </section>
     <section class="tabpanel" role="tabpanel" id="tab-oportunidades" aria-labelledby="tabBtn-oportunidades" hidden>
@@ -632,11 +632,11 @@
           <h2>Calificados por embudo</h2>
           <span class="period-badge" id="crosstabPeriodBadge"></span>
         </div>
-        <p class="help">Quién está parado en la etapa "Calificado" ahora mismo, en cada embudo, y a cuánto suma en pesos.</p>
+        <p class="help">Leads que hoy están en la parte media-baja del embudo: de Cita en campus en adelante (asistió a visita, clase muestra, entrevista, horarios e inicio de proceso de pago). En redes sociales, los que la IA pasó a Calificado. Con su monto en pesos.</p>
         <div id="crosstabStats"></div>
         <div id="crosstabTable"></div>
         <div class="help" id="crosstabExcluidos" style="margin-top:10px;"></div>
-        <details><summary>JSON crudo</summary><pre id="rawJsonCrosstab"></pre></details>
+      <pre id="rawJsonCrosstab" style="display:none !important;"></pre>
       </div>
       <div class="panel">
         <div class="panel-head">
@@ -644,7 +644,7 @@
           <h2 id="calificadosListaTitulo">Leads calificados</h2>
           <button type="button" id="btnExportarCalificados" class="export-btn"><span id="iconExportar"></span><span>Exportar</span></button>
         </div>
-        <p class="help">Listado de leads que están en la etapa "Calificado".</p>
+        <p class="help">Los mismos leads, uno por uno (de Cita en campus en adelante).</p>
         <div class="embudo-filter-row">
           <label for="calificadosEmbudoFiltro">Embudo</label>
           <select id="calificadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
@@ -658,13 +658,13 @@
     <div class="panel">
       <div class="panel-head">
         <div class="panel-icon" id="iconGanados"></div>
-        <h2>Ganados del periodo</h2>
+        <h2>Inscritos del periodo</h2>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: $220,000 MXN mensuales</b><br>Ventas registradas: leads que hoy están en la etapa de cierre ganado (Leads ganados, Logrado con éxito o Closed - won) y cuya fecha de cierre cae dentro del rango de fechas elegido arriba, con el monto total y el ticket promedio. Este tablero siempre va por fecha de cierre, aunque arriba esté seleccionada "Fecha de creación". Un lead que se regresó a otra etapa después de ganarse ya no cuenta.</p>
+      <p class="help"><b style="color:var(--ink-soft)">Objetivo: por definir con Indemo</b><br>Leads que hoy están en Inscrito (o Pago realizado en CDMX) y cuya fecha de inscripción cae en el rango de fechas de arriba, con el monto total y el promedio por inscripción. Siempre va por fecha de inscripción, aunque arriba esté elegida «Fecha de creación». Si un lead se regresó a otra etapa ya no cuenta.</p>
       <div id="ganadosStats"></div>
       <div id="ganadosTable"></div>
-      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Desglose de leads ganados</h3>
-      <p class="help" style="margin-bottom:12px;">Cada venta cerrada en el periodo, con contacto, compañía, responsable y etiquetas. Ordenado por embudo (alfabético) y luego de mayor a menor monto.</p>
+      <h3 style="font-family:var(--display); font-size:13px; color:var(--ink-soft); font-weight:600; margin:22px 0 4px; letter-spacing:-.005em;">Desglose de inscritos</h3>
+      <p class="help" style="margin-bottom:12px;">Cada inscripción del periodo, con contacto, responsable y etiquetas. Ordenado por embudo (alfabético) y luego de mayor a menor monto.</p>
       <div class="embudo-filter-row">
         <label for="ganadosEmbudoFiltro">Embudo</label>
         <select id="ganadosEmbudoFiltro"><option value="">Todos los embudos</option></select>
@@ -686,7 +686,7 @@
         <div class="panel-icon" id="iconIAAtencion"></div>
         <div class="panel-title"><h2>Atención a los leads que asigna la IA</h2><p class="panel-sub">Qué tan rápido actúa la asesora después de que la IA le asigna un lead.</p></div>
       </div>
-      <p class="help">Desde que la IA asigna el lead, cuánto tarda alguien del equipo en hacer algo con él (mensaje, llamada, nota, tarea o cambio de etapa), contado en horario laboral de lunes a viernes de 9:00 a 18:00. Sin atender = más de 24 h sin ninguna acción. Pendiente de afinar con Manu: tiempo ideal de 20 minutos y cortes de 24 y 48 horas.</p>
+      <p class="help">Desde que la IA asigna el lead, cuánto tarda alguien del equipo en hacer algo con él (mensaje, llamada, nota, tarea o cambio de etapa), contado en horario laboral de lunes a viernes de 9:00 a 18:00. Atendidos = alguien del equipo ya actuó. Sin atender = pasaron más de 24 h hábiles sin ninguna acción. Aún en plazo = la IA lo asignó hace menos de 24 h hábiles y todavía nadie actúa: aún no cuenta como falla.</p>
       <div id="iaAtencionStats"></div>
       <div id="iaAtencionTabla"></div>
       <div id="iaSinAtender"></div>
@@ -699,21 +699,21 @@
         <h2>Comparativa mes a mes — mismo tramo de días</h2>
         <span class="period-badge" id="comparativaParcialBadge"></span>
       </div>
-      <p class="help">Toma el <b>rango de fechas que elegiste arriba</b> y lo compara contra el mismo tramo de días en los 2 meses anteriores: si arriba pones <b>del 1 al 20 de septiembre</b>, compara 1&ndash;20 jul, 1&ndash;20 ago y 1&ndash;20 sep. Así la comparación es pareja (mismo número de días en cada mes) sin importar en qué día se corra el reporte. Por fecha de creación del lead. Respeta también los filtros de embudos, agentes y etiquetas de arriba.</p>
+      <p class="help">Toma el <b>rango de fechas que elegiste arriba</b> y lo compara contra el mismo tramo de días en los 2 meses anteriores: si arriba pones <b>del 1 al 20 de septiembre</b>, compara 1&ndash;20 jul, 1&ndash;20 ago y 1&ndash;20 sep. Así la comparación es pareja (mismo número de días en cada mes) sin importar en qué día se corra el reporte. Por fecha de creación del lead: «Inscritos» son los leads creados en ese tramo que hoy están inscritos, por eso puede no coincidir con la pestaña Ventas, que va por fecha de inscripción. Respeta también los filtros de embudos, agentes y etiquetas de arriba.</p>
       <div id="comparativaParcialStats"></div>
       <div id="comparativaParcialTable"></div>
-      <details><summary>JSON crudo</summary><pre id="rawJsonComparativaParcial"></pre></details>
+      <pre id="rawJsonComparativaParcial" style="display:none !important;"></pre>
     </div>
     <div class="calif-row">
       <div class="panel">
         <div class="panel-head">
           <div class="panel-icon" id="iconVentasSemestre"></div>
-          <h2>Comparativo de ventas — últimos 6 meses</h2>
+          <h2>Comparativo de inscripciones — últimos 6 meses</h2>
         </div>
-        <p class="help">Monto de leads ganados en Kommo por mes (fecha de cierre), de los últimos 6 meses incluyendo el mes en curso. Respeta los filtros de embudos, agentes y etiquetas de arriba; el rango de fechas de arriba no le aplica (siempre son los últimos 6 meses).<br><b style="color:var(--ink-soft)">El mes marcado con * va incompleto</b> (cortado al día de hoy): se dibuja punteado y no entra en el promedio ni en el "mejor mes". Para comparar tramos parejos, usa la comparativa mes a mes de arriba.</p>
+        <p class="help">Monto de los inscritos por mes (por fecha de inscripción, igual que la pestaña Ventas), de los últimos 6 meses incluyendo el mes en curso. Respeta los filtros de embudos, agentes y etiquetas de arriba; el rango de fechas de arriba no le aplica (siempre son los últimos 6 meses).<br><b style="color:var(--ink-soft)">El mes marcado con * va incompleto</b> (cortado al día de hoy): se dibuja punteado y no entra en el promedio ni en el "mejor mes". Para comparar tramos parejos, usa la comparativa mes a mes de arriba.</p>
         <div id="ventasSemestreStats"></div>
         <div id="ventasSemestreChart"></div>
-        <details><summary>JSON crudo</summary><pre id="rawJsonVentasSemestre"></pre></details>
+      <pre id="rawJsonVentasSemestre" style="display:none !important;"></pre>
       </div>
       <div class="panel">
         <div class="panel-head">
@@ -723,7 +723,7 @@
         <p class="help">Cantidad de leads que entraron en Kommo por mes (fecha de creación), de los últimos 6 meses incluyendo el mes en curso. Cuenta solo los embudos del mapeo del reporte, los mismos que salen en "Leads por periodo". Respeta los filtros de embudos, agentes y etiquetas de arriba; el rango de fechas de arriba no le aplica (siempre son los últimos 6 meses).<br><b style="color:var(--ink-soft)">El mes marcado con * va incompleto</b> (cortado al día de hoy): se dibuja punteado y no entra en el promedio ni en el "mejor mes".</p>
         <div id="leadsEntrantesSemestreStats"></div>
         <div id="leadsEntrantesSemestreChart"></div>
-        <details><summary>JSON crudo</summary><pre id="rawJsonLeadsEntrantesSemestre"></pre></details>
+      <pre id="rawJsonLeadsEntrantesSemestre" style="display:none !important;"></pre>
       </div>
     </div>
     </section>
@@ -1274,7 +1274,7 @@ function renderLeadsVivos(payload) {
   els.leadsVivosStats.innerHTML = '<div class="stats-row">' +
     statCard('zap', 'var(--c-positive)', 'Leads vivos', total.toLocaleString('es-MX')) +
     statCard('layers', 'var(--ink-soft)', 'Embudos con leads vivos', filas.filter(r => r.valor > 0).length) +
-    statCard('users', 'var(--ink-soft)', 'Asesores con leads vivos', filasAsesor.length) +
+    statCard('users', 'var(--ink-soft)', 'Asesores con leads vivos', filasAsesor.filter(r => r.etiqueta !== 'Sin asesor asignado').length) +
     '</div>';
   els.leadsVivosTable.innerHTML = miniTabla(filas, 'Embudo');
   els.leadsVivosAsesorTable.innerHTML = miniTabla(filasAsesor, 'Asesor');
@@ -1342,7 +1342,7 @@ function renderLeadsPorPeriodo(payload) {
 
   els.leadsPeriodoStats.innerHTML = '<div class="stats-row">' +
     statCard('layers', 'var(--ink-soft)', 'Total leads del periodo', totalAsesor) +
-    statCard('users', 'var(--ink-soft)', 'Asesores con leads', filasAsesor.length) +
+    statCard('users', 'var(--ink-soft)', 'Asesores con leads', filasAsesor.filter(r => r.etiqueta !== 'Sin asesor asignado').length) +
     (totalAsesor !== totalEmbudo
       ? statCard('xCircle', 'var(--c-loss)', 'Revisar', 'sumas no coinciden (' + totalAsesor + ' vs ' + totalEmbudo + ')')
       : '') +
@@ -1364,9 +1364,9 @@ function renderResultados(payload) {
 
   els.resultsStats.innerHTML = '<div class="stats-row">' +
     statCard('layers', 'var(--ink-soft)', 'Total leads', totales.total) +
-    statCard('checkCircle', 'var(--c-positive)', 'Ganados', totales.ganado, pct(totales.ganado, totales.total) + ' de conversión') +
-    statCard('dollar', 'var(--ink-soft)', 'Monto ganado', '$' + totales.monto_ganado.toLocaleString('es-MX', {maximumFractionDigits:0})) +
-    statCard('xCircle', 'var(--c-loss)', 'Descalificados', totales.perdido) +
+    statCard('checkCircle', 'var(--c-positive)', 'Inscritos', totales.ganado, pct(totales.ganado, totales.total) + ' de los recibidos') +
+    statCard('dollar', 'var(--ink-soft)', 'Monto de inscripciones', '$' + totales.monto_ganado.toLocaleString('es-MX', {maximumFractionDigits:0})) +
+    statCard('xCircle', 'var(--c-loss)', 'Perdidos', totales.perdido) +
     '</div>';
 
   const rows = embudos.map(e => {
@@ -1375,8 +1375,8 @@ function renderResultados(payload) {
       <td>${e.embudo}</td>
       <td class="num"><span class="numval">${e.total}</span></td>
       <td class="num"><span class="numval">${e.efectivo}</span><span class="pct">${pct(e.efectivo, e.total)}</span></td>
-      <td class="num"><span class="numval">${e.cotizacion}</span><span class="pct">${pct(e.cotizacion, e.total)}</span></td>
       <td class="num"><span class="numval">${e.calificado}</span><span class="pct">${pct(e.calificado, e.total)}</span></td>
+      <td class="num"><span class="numval">${e.cotizacion}</span><span class="pct">${pct(e.cotizacion, e.total)}</span></td>
       <td class="num"><span class="numval">${e.ganado}</span></td>
       <td class="num"><span class="numval">$${e.monto_ganado.toLocaleString('es-MX')}</span></td>
       <td class="num"><span class="numval">${pct(e.ganado, e.total)}</span></td>
@@ -1387,13 +1387,13 @@ function renderResultados(payload) {
   els.resultsTable.innerHTML = `
     <div class="table-scroll">
     <table>
-      <thead><tr><th>Embudo</th><th class="num">Recibidos</th><th class="num">Efectivo</th><th class="num">Cotiz.</th><th class="num">Calif.</th><th class="num">Ganado</th><th class="num">Monto</th><th class="num">Tasa cierre</th><th class="num">Descalificado</th></tr></thead>
+      <thead><tr><th>Embudo</th><th class="num">Recibidos</th><th class="num">Contacto efectivo</th><th class="num">Visita agendada</th><th class="num">Proceso de inscripción</th><th class="num">Inscritos</th><th class="num">Monto</th><th class="num">Tasa de inscripción</th><th class="num">Perdidos</th></tr></thead>
       <tbody>${rows}
         <tr class="totales">
           <td>Total</td><td class="num"><span class="numval">${totales.total}</span></td>
           <td class="num"><span class="numval">${totales.efectivo}</span><span class="pct">${pct(totales.efectivo, totales.total)}</span></td>
-          <td class="num"><span class="numval">${totales.cotizacion}</span><span class="pct">${pct(totales.cotizacion, totales.total)}</span></td>
           <td class="num"><span class="numval">${totales.calificado}</span><span class="pct">${pct(totales.calificado, totales.total)}</span></td>
+          <td class="num"><span class="numval">${totales.cotizacion}</span><span class="pct">${pct(totales.cotizacion, totales.total)}</span></td>
           <td class="num"><span class="numval">${totales.ganado}</span></td><td class="num"><span class="numval">$${totales.monto_ganado.toLocaleString('es-MX')}</span></td>
           <td class="num"><span class="numval">${pct(totales.ganado, totales.total)}</span></td>
           <td class="num"><span class="numval">${totales.perdido}</span></td>
@@ -1542,7 +1542,7 @@ function renderCrosstab(payload) {
     </table>
     </div>`;
   const excluidos = payload.embudos_excluidos_sin_etapa_calificado || [];
-  els.crosstabExcluidos.textContent = excluidos.length ? `No incluidos (sin etapa "Calificado"): ${excluidos.join(', ')}` : '';
+  els.crosstabExcluidos.textContent = excluidos.length ? `No incluidos: ${excluidos.join(', ')}` : '';
 
   leadsCalificadosDetalleData = payload.leads_calificados_detalle || [];
   calificadosListaPage = 1;
@@ -1555,15 +1555,15 @@ function renderCrosstab(payload) {
 function renderGanados(payload) {
   const embudos = Object.values(payload.por_embudo || {}).filter(e => e.ganado > 0);
   renderGanadosDetalle(payload.ganados_detalle || []);
-  if (!embudos.length) { els.ganadosStats.innerHTML = ''; els.ganadosTable.innerHTML = '<div class="empty">Sin ganados en este periodo con estos filtros.</div>'; return; }
+  if (!embudos.length) { els.ganadosStats.innerHTML = ''; els.ganadosTable.innerHTML = '<div class="empty">Sin inscritos en este periodo con estos filtros.</div>'; return; }
   const totalProyectos = embudos.reduce((s, e) => s + e.ganado, 0);
   const totalMonto = embudos.reduce((s, e) => s + e.monto_ganado, 0);
   const ticketTotal = totalProyectos ? (totalMonto / totalProyectos) : 0;
 
   els.ganadosStats.innerHTML = '<div class="stats-row">' +
-    statCard('checkCircle', 'var(--c-positive)', 'Proyectos', totalProyectos) +
+    statCard('checkCircle', 'var(--c-positive)', 'Inscritos', totalProyectos) +
     statCard('dollar', 'var(--ink-soft)', 'Monto total', '$' + totalMonto.toLocaleString('es-MX', {maximumFractionDigits:0})) +
-    statCard('barChart', 'var(--ink-soft)', 'Ticket promedio', '$' + ticketTotal.toLocaleString('es-MX', {maximumFractionDigits:0})) +
+    statCard('barChart', 'var(--ink-soft)', 'Promedio por inscripción', '$' + ticketTotal.toLocaleString('es-MX', {maximumFractionDigits:0})) +
     '</div>';
 
   const rows = embudos.map(e => {
@@ -1579,7 +1579,7 @@ function renderGanados(payload) {
   els.ganadosTable.innerHTML = `
     <div class="table-scroll">
     <table>
-      <thead><tr><th>Embudo</th><th class="num">Proyectos</th><th class="num">Monto (MXN)</th><th class="num">Ticket promedio</th></tr></thead>
+      <thead><tr><th>Embudo</th><th class="num">Inscritos</th><th class="num">Monto (MXN)</th><th class="num">Promedio</th></tr></thead>
       <tbody>${rows}
         <tr class="totales">
           <td>Total</td>
@@ -1620,7 +1620,7 @@ function renderGanadosDetalle(detalle) {
 }
 
 function renderGanadosDetalleTabla() {
-  if (!ganadosDetalleData.length) { els.ganadosDetalleTable.innerHTML = '<div class="empty">Sin ganados en este periodo con estos filtros.</div>'; return; }
+  if (!ganadosDetalleData.length) { els.ganadosDetalleTable.innerHTML = '<div class="empty">Sin inscritos en este periodo con estos filtros.</div>'; return; }
   const vista = getGanadosDetalleVista();
   if (!vista.length) { els.ganadosDetalleTable.innerHTML = '<div class="empty">Ningún ganado en ese embudo.</div>'; return; }
   const rows = vista.map(g => `
@@ -1768,10 +1768,11 @@ function sumarEmbudos(payload) {
   return embudos.reduce((acc, e) => ({
     leads: acc.leads + (e.total || 0),
     cotizacion: acc.cotizacion + (e.cotizacion || 0),
+    visita: acc.visita + (e.calificado || 0),
     monto_cotizacion: acc.monto_cotizacion + (e.monto_cotizacion || 0),
     ganado: acc.ganado + (e.ganado || 0),
     monto_ganado: acc.monto_ganado + (e.monto_ganado || 0),
-  }), { leads: 0, cotizacion: 0, monto_cotizacion: 0, ganado: 0, monto_ganado: 0 });
+  }), { leads: 0, cotizacion: 0, visita: 0, monto_cotizacion: 0, ganado: 0, monto_ganado: 0 });
 }
 
 function renderBarChartMensual(container, datos, { valor, color, fmtValor }) {
@@ -1844,12 +1845,12 @@ function renderComparativaParcial(datos) {
     statCard('layers', 'var(--c-neutral)', 'Leads · ' + ultimo.label,
       ultimo.leads.toLocaleString('es-MX'),
       previo ? 'vs ' + previo.leads.toLocaleString('es-MX') + ' en ' + previo.label : '') +
-    statCard('target', 'var(--c-positive)', 'En cotización · ' + ultimo.label,
-      ultimo.cotizacion.toLocaleString('es-MX'),
-      pct(ultimo.cotizacion, ultimo.leads) + ' de los leads' + (previo ? ' · antes ' + pct(previo.cotizacion, previo.leads) : '')) +
-    statCard('dollar', 'var(--c-positive)', 'Monto cotizado · ' + ultimo.label,
-      money(ultimo.monto_cotizacion),
-      previo ? 'vs ' + money(previo.monto_cotizacion) + ' en ' + previo.label : '') +
+    statCard('target', 'var(--c-positive)', 'Visita agendada · ' + ultimo.label,
+      ultimo.visita.toLocaleString('es-MX'),
+      pct(ultimo.visita, ultimo.leads) + ' de los leads' + (previo ? ' · antes ' + pct(previo.visita, previo.leads) : '')) +
+    statCard('dollar', 'var(--c-positive)', 'Monto de inscripciones · ' + ultimo.label,
+      money(ultimo.monto_ganado),
+      previo ? 'vs ' + money(previo.monto_ganado) + ' en ' + previo.label : '') +
     '</div>';
 
   const columnas = datos.map(d =>
@@ -1874,10 +1875,9 @@ function renderComparativaParcial(datos) {
       <thead><tr><th>Métrica</th>${columnas}<th class="num">Δ último mes</th></tr></thead>
       <tbody>
         ${fila('Leads entrantes', d => d.leads, num)}
-        ${fila('Leads en cotización', d => d.cotizacion, num, d => pct(d.cotizacion, d.leads))}
-        ${fila('Monto cotizado', d => d.monto_cotizacion, money)}
-        ${fila('Ganados', d => d.ganado, num, d => pct(d.ganado, d.leads))}
-        ${fila('Monto ganado', d => d.monto_ganado, money)}
+        ${fila('Visita agendada', d => d.visita, num, d => pct(d.visita, d.leads))}
+        ${fila('Inscritos', d => d.ganado, num, d => pct(d.ganado, d.leads))}
+        ${fila('Monto de inscripciones', d => d.monto_ganado, money)}
       </tbody>
     </table>
     </div>`;
@@ -1917,7 +1917,7 @@ function renderVentasSemestre(datos) {
     '</div>';
 
   if (!total) {
-    els.ventasSemestreChart.innerHTML = '<div class="empty">Sin ventas ganadas en los últimos 6 meses.</div>';
+    els.ventasSemestreChart.innerHTML = '<div class="empty">Sin inscripciones en los últimos 6 meses.</div>';
     return;
   }
   renderBarChartMensual(els.ventasSemestreChart, datos, { valor: d => d.monto, color: 'var(--c-positive)', fmtValor: fmtMontoCorto });
@@ -1959,7 +1959,7 @@ function renderLeadsEntrantesSemestre(datos) {
 
 function nombreAgente(id) {
   const found = agentsCatalog.find(a => String(a.id) === String(id));
-  return found ? found.name : (Number(id) === 0 ? 'Sin aceptar (Incoming leads)' : `Usuario ${id}`);   // INDEMO: responsable 0 = lead entrante que nadie ha aceptado en Kommo
+  return found ? found.name : (Number(id) === 0 ? 'Sin asesor asignado' : `Usuario ${id}`);   // INDEMO: responsable 0 = lead entrante que nadie ha aceptado en Kommo
 }
 function fmtMinSeg(segundos) {
   const t = Math.round(segundos);
@@ -2351,7 +2351,7 @@ async function cargarSeguimientoSemanal(filtros, desde, hasta) {
     els.rawJsonSemana.textContent = JSON.stringify(data, null, 2);
     renderSeguimientoSemanal(extractPayload(data, 'resumen'));
   } catch (err) {
-    els.semanaTabla.innerHTML = '<div class="empty">No se pudo cargar el seguimiento de los primeros 10 días: ' + escHtml(err.message) + '</div>';
+    els.semanaTabla.innerHTML = '<div class="empty">No se pudo cargar el seguimiento de los primeros 7 días: ' + escHtml(err.message) + '</div>';
     console.error(err);
   }
 }
@@ -2362,7 +2362,7 @@ function renderSeguimientoSemanal(payload) {
   const r = payload.resumen;
   const pctDe = n => r.evaluados ? fmtPct1((n / r.evaluados) * 100) + '% de los evaluados' : '—';
   els.semanaStats.innerHTML = '<div class="stats-row cuatro">' +
-    pastillaTiempos('Leads evaluados', r.evaluados, '<span>' + r.fuera_evaluacion + ' fuera de la evaluación</span>') +
+    pastillaTiempos('Leads evaluados', r.evaluados, '<span>' + r.fuera_evaluacion + ' fuera: aún no cumplen 7 días o ya cerraron</span>') +
     pastillaTiempos('Menos de 5 seguimientos', r.menos_de_5, '<span>' + pctDe(r.menos_de_5) + '</span>') +
     pastillaTiempos('Menos de 3 seguimientos', r.menos_de_3, '<span>' + pctDe(r.menos_de_3) + '</span>') +
     pastillaTiempos('Sin seguimiento', r.sin_seguimiento, '<span>' + pctDe(r.sin_seguimiento) + '</span>') +
@@ -2377,8 +2377,8 @@ function renderSeguimientoSemanal(payload) {
     '<div class="sem-bar' + (d.seguimientos === 0 ? ' cero' : '') + '"><span>' + d.etiqueta + (d.etiqueta === '1' ? ' seguimiento' : ' seguimientos') + '</span>' +
     '<div class="track"><div class="fill" style="width:' + (d.leads ? Math.max(1.5, (d.leads / max) * 100) : 0) + '%"></div></div><span class="n">' + d.leads + '</span></div>').join('');
   els.semanaLeer.innerHTML =
-    '<p>Un lead con <b>0 seguimientos</b> recibió el primer mensaje y nadie le volvió a escribir ni llamar en sus primeros 10 días.</p>' +
-    '<p>Fuera de la evaluación: ' + r.aun_no_cumplen_semana + ' leads aún no cumplen sus 10 días; ' + r.cerrados_en_semana + ' se ganaron o perdieron dentro de sus primeros 10 días.</p>';
+    '<p>Un lead con <b>0 seguimientos</b> recibió el primer mensaje y nadie le volvió a escribir ni llamar en sus primeros 7 días.</p>' +
+    '<p>Fuera de la evaluación: ' + r.aun_no_cumplen_semana + ' leads aún no cumplen sus 7 días; ' + r.cerrados_en_semana + ' se inscribieron o perdieron dentro de sus primeros 7 días.</p>';
   els.semanaGrid.hidden = false;
   renderSemanaTabla();
 }
