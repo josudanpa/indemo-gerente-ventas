@@ -591,9 +591,9 @@
     <div class="panel" id="semanaPanel">
       <div class="panel-head">
         <div class="panel-icon" id="iconSemana"></div>
-        <div class="panel-title"><h2>Seguimiento en la primera semana</h2><p class="panel-sub">Leads creados en el periodo · días en que se les volvió a escribir o llamar en sus primeros 7 días</p></div>
+        <div class="panel-title"><h2>Seguimiento en la primera semana</h2><p class="panel-sub">Leads creados en el periodo · días en que se les volvió a escribir, llamar o se completó una tarea suya en sus primeros 7 días</p></div>
       </div>
-      <p class="help">Cuenta cuántos días distintos se le volvió a escribir o llamar a cada lead en sus primeros 7 días. Un seguimiento es un día, distinto al del primer contacto, en que una persona (no un robot) le mandó mensaje o le llamó; varios el mismo día cuentan como uno. Solo se evalúa a los leads que ya cumplieron sus 7 días y que no se inscribieron ni se perdieron en ellos; por eso «Leads evaluados» es menor que los leads del periodo (los más recientes todavía no cumplen la semana). Audita CDMX y Monterrey y respeta los filtros de arriba.</p>
+      <p class="help">Cuenta cuántos días distintos se le volvió a escribir, llamar o se completó una tarea de cada lead en sus primeros 7 días. Un seguimiento es un día, distinto al del primer contacto, en que una persona (no un robot) le mandó mensaje, le llamó o completó una tarea del lead en Kommo; varios el mismo día cuentan como uno. Solo se evalúa a los leads que ya cumplieron sus 7 días y que no se inscribieron ni se perdieron en ellos; por eso «Leads evaluados» es menor que los leads del periodo (los más recientes todavía no cumplen la semana). Audita CDMX y Monterrey y respeta los filtros de arriba.</p>
       <div id="semanaStats"></div>
       <div class="semana-grid" id="semanaGrid" hidden>
         <div><h3>Seguimientos en los primeros 7 días</h3><div id="semanaBars"></div></div>
@@ -2375,7 +2375,7 @@ function renderSeguimientoSemanal(payload) {
     '<div class="sem-bar' + (d.seguimientos === 0 ? ' cero' : '') + '"><span>' + d.etiqueta + (d.etiqueta === '1' ? ' seguimiento' : ' seguimientos') + '</span>' +
     '<div class="track"><div class="fill" style="width:' + (d.leads ? Math.max(1.5, (d.leads / max) * 100) : 0) + '%"></div></div><span class="n">' + d.leads + '</span></div>').join('');
   els.semanaLeer.innerHTML =
-    '<p>Un lead con <b>0 seguimientos</b> recibió el primer mensaje y nadie le volvió a escribir ni llamar en sus primeros 7 días.</p>' +
+    '<p>Un lead con <b>0 seguimientos</b> tuvo su primer contacto y nadie le volvió a escribir, llamar ni completó una tarea suya en sus primeros 7 días.</p>' +
     '<p>Fuera de la evaluación: ' + r.aun_no_cumplen_semana + ' leads aún no cumplen sus 7 días; ' + r.cerrados_en_semana + ' se inscribieron o perdieron dentro de sus primeros 7 días.</p>';
   els.semanaGrid.hidden = false;
   renderSemanaTabla();
