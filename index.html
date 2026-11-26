@@ -523,7 +523,7 @@
         <div class="panel-icon" id="iconLeadsPeriodo"></div>
         <div class="panel-title"><h2>Leads recibidos de campañas por periodo</h2><p class="panel-sub">Mide que esté entrando el volumen de leads correctos.</p></div>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: por definir con Indemo</b><br>Cuántos leads de campañas se recibieron en el periodo, vistos de dos formas — por asesor y por embudo. Solo cuenta los leads que traen alguna etiqueta de campaña: META, INSTAGRAM / INST, formularios de Facebook (fb…), LANDING PAGE, LANDING MILÁN / MILAN, PÁGINA WEB o Form. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto. Como solo cuenta leads de campaña, el total es menor que en «Tiempos de respuesta», que cuenta todos los leads que entran (también WhatsApp directo, OPENDAY, orgánicos o captura manual). «Sin asesor asignado» = leads que entraron y nadie ha tomado en Kommo.</p>
+      <p class="help"><b style="color:var(--ink-soft)">Objetivo: por definir con Indemo</b><br>Cuántos leads de campañas se recibieron en el periodo, vistos de dos formas — por asesor y por embudo. Solo cuenta los leads que traen alguna etiqueta de campaña: META, INSTAGRAM / INST, formularios de Facebook (fb…), LANDING PAGE, LANDING MILÁN / MILAN, PÁGINA WEB o Form. Las dos sumas tienen que coincidir: es la misma población de leads, nada más que el desglose es distinto. Como solo cuenta leads de campaña, el total es menor que en «Tiempos de respuesta», que cuenta todos los leads que entran (también WhatsApp directo, OPENDAY, orgánicos o captura manual). «Sin asesor asignado» = leads que entraron y nadie ha tomado en Kommo. Si eliges etiquetas en los filtros, cuenta los leads de campaña que además traen alguna de ellas.</p>
       <div id="leadsPeriodoStats"></div>
       <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:14px;">
         <div style="flex:1; min-width:260px;">
@@ -564,7 +564,7 @@
         <div class="panel-icon" id="iconTiempos"></div>
         <div class="panel-title"><h2>Tiempos de respuesta a leads entrantes</h2><p class="panel-sub">Mide la rapidez del primer contacto. Un lead sin respuesta ágil se enfría y deja de responder.</p></div>
       </div>
-      <p class="help"><b style="color:var(--ink-soft)">Objetivo: -5 minutos</b><br>Por cada embudo, el promedio de tiempo entre la creación del lead y su primera atención: llamada saliente, nota nueva, mensaje saliente o conversación contestada (lo que ocurra primero, sobre el contacto del lead), contando solo horas dentro de horario laboral (lunes a viernes, 9:00-18:00, sin contar los días festivos oficiales de descanso obligatorio). No incluye los leads que un usuario creó a mano (no son entrantes). Cuenta todos los leads que entran, traigan o no etiqueta de campaña; por eso el total es mayor que en «Leads recibidos de campañas». Los tiempos son en horario laboral: en horas de reloj (noches y fines de semana) son más.</p>
+      <p class="help"><b style="color:var(--ink-soft)">Objetivo: -5 minutos</b><br>Por cada embudo, el promedio de tiempo entre la creación del lead y su primera atención: llamada saliente, nota nueva, mensaje saliente o conversación contestada (lo que ocurra primero, sobre el contacto del lead), contando solo horas dentro de horario laboral (lunes a viernes, 9:00-18:00, sin contar los días festivos oficiales de descanso obligatorio). No incluye los leads que un usuario creó a mano (no son entrantes). Cuenta todos los leads que entran, traigan o no etiqueta de campaña; por eso el total es mayor que en «Leads recibidos de campañas». Si eliges etiquetas en los filtros, solo cuenta los leads que traen alguna de ellas. Los tiempos son en horario laboral: en horas de reloj (noches y fines de semana) son más.</p>
       <div id="respTimesStats"></div>
       <div id="respTimesComparativa"></div>
       <div id="respTimesTable"></div>
@@ -1122,7 +1122,7 @@ els.btnGenerar.addEventListener('click', async () => {
     const respTimesBody = {
       type: 'leads', view: 'response_times',
       date_from: els.dateFrom.value, date_to: els.dateTo.value,
-      pipeline_ids: pipelineIds,
+      pipeline_ids: pipelineIds, tag_ids: tagIds,
     };
 
     const [perfData, crossData, callsData, respTimesData] = await Promise.all([
@@ -1202,19 +1202,17 @@ async function cargarGanados(filtros, desde, hasta) {
 
 /* ============================== RENDER: Leads recibidos de campañas por periodo ============================== */
 // Misma consulta de "performance", pero solo con leads que traen alguna de las etiquetas de campaña
-// (en INDEMO: META, INSTAGRAM, formularios fb..., landings y pagina web). Si además se marcaron etiquetas arriba, cuenta solo las que
-// estén en ambas listas.
+// (en INDEMO: META, INSTAGRAM, formularios fb..., landings y pagina web). Si además se marcaron etiquetas arriba, cuenta los leads
+// que traen alguna de las elegidas Y alguna de campaña (26-nov: antes cruzaba las dos listas y daba cero con «CDMX - INSTAFORM»).
 async function cargarLeadsCampanas(filtros, desde, hasta) {
   els.leadsPorAsesorTable.innerHTML = '<div class="empty loading"><span class="spinner" aria-hidden="true"></span>Cargando…</div>';
   els.leadsPorEmbudoTable.innerHTML = '<div class="empty loading"><span class="spinner" aria-hidden="true"></span>Cargando…</div>';
   els.leadsPeriodoStats.innerHTML = '';
   try {
     if (!tagsCampanaIds.length) throw new Error('no se encontraron las etiquetas de campaña en el catálogo');
-    const efectivas = filtros.tagIds.length ? tagsCampanaIds.filter(id => filtros.tagIds.includes(id)) : tagsCampanaIds;
-    if (!efectivas.length) { renderLeadsPorPeriodo({ leads_por_asesor: {}, leads_por_embudo: {} }); return; }
     const data = await callWebhook({
       type: 'leads', view: 'performance', date_from: desde, date_to: hasta, filter_by: filterBy,
-      pipeline_ids: filtros.pipelineIds, agent_ids: filtros.agentIds, tag_ids: efectivas,
+      pipeline_ids: filtros.pipelineIds, agent_ids: filtros.agentIds, tag_ids: filtros.tagIds, tag_ids_campana: tagsCampanaIds,
     });
     renderLeadsPorPeriodo(extractPayload(data, 'por_embudo'));
   } catch (err) {
@@ -2525,7 +2523,7 @@ async function cargarComparativaTiempos(filtros, desde, hasta) {
   try {
     const datos = [];
     for (const p of periodosAnteriores(desde, hasta)) { // uno a la vez: no saturar el webhook
-      const data = await callWebhook({ type: 'leads', view: 'response_times', date_from: p.desde, date_to: p.hasta, pipeline_ids: filtros.pipelineIds });
+      const data = await callWebhook({ type: 'leads', view: 'response_times', date_from: p.desde, date_to: p.hasta, pipeline_ids: filtros.pipelineIds, tag_ids: filtros.tagIds });
       datos.push({ ...p, ...resumenTiempos(extractPayload(data, 'por_embudo')) });
     }
     respTimesComparativa = datos;
