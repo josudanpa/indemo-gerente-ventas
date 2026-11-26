@@ -593,7 +593,7 @@
         <div class="panel-icon" id="iconSemana"></div>
         <div class="panel-title"><h2>Seguimiento en la primera semana</h2><p class="panel-sub">Leads creados en el periodo · días en que se les volvió a escribir, llamar o se completó una tarea suya en sus primeros 7 días</p></div>
       </div>
-      <p class="help">Cuenta cuántos días distintos se le volvió a escribir, llamar o se completó una tarea de cada lead en sus primeros 7 días. Un seguimiento es un día, distinto al del primer contacto, en que una persona (no un robot) le mandó mensaje, le llamó o completó una tarea del lead en Kommo; varios el mismo día cuentan como uno. Solo se evalúa a los leads que ya cumplieron sus 7 días y que no se inscribieron ni se perdieron en ellos; por eso «Leads evaluados» es menor que los leads del periodo (los más recientes todavía no cumplen la semana). Audita CDMX y Monterrey y respeta los filtros de arriba.</p>
+      <p class="help">Cuenta cuántos días distintos se le volvió a escribir, llamar o se completó una tarea de cada lead en sus primeros 7 días. Un seguimiento es un día, distinto al del primer contacto, en que una persona (no un robot) le mandó mensaje, le llamó o completó una tarea del lead en Kommo; varios el mismo día cuentan como uno. «Último mensaje o acción» es lo más reciente que hizo el vendedor en el lead (mensaje, llamada o tarea completada) hasta hoy, aunque haya sido después de la primera semana. Solo se evalúa a los leads que ya cumplieron sus 7 días y que no se inscribieron ni se perdieron en ellos; por eso «Leads evaluados» es menor que los leads del periodo (los más recientes todavía no cumplen la semana). Audita CDMX y Monterrey y respeta los filtros de arriba.</p>
       <div id="semanaStats"></div>
       <div class="semana-grid" id="semanaGrid" hidden>
         <div><h3>Seguimientos en los primeros 7 días</h3><div id="semanaBars"></div></div>
@@ -2334,7 +2334,7 @@ const SEMANA_COLUMNAS = {
   creado:      { titulo: 'Creado',         valor: l => l.creado_ts, num: true },
   primer:      { titulo: 'Primer contacto', valor: l => l.primer_contacto_ts, num: true },
   seguimientos:{ titulo: 'Seguimientos',   valor: l => l.seguimientos, num: true },
-  ultimo:      { titulo: 'Último mensaje', valor: l => l.ultimo_mensaje_ts, num: true },
+  ultimo:      { titulo: 'Último mensaje o acción', valor: l => l.ultimo_mensaje_ts, num: true },
 };
 
 async function cargarSeguimientoSemanal(filtros, desde, hasta) {
@@ -2463,7 +2463,7 @@ function renderSemanaTabla() {
 function descargarCsvSemana() {
   const lista = semanaListaActual();
   if (!lista.length) return;
-  const filas = [['ID lead', 'Enlace Kommo', 'Embudo', 'Etapa actual', 'Responsable', 'Creado', 'Primer contacto', 'Seguimientos', 'Último mensaje']];
+  const filas = [['ID lead', 'Enlace Kommo', 'Embudo', 'Etapa actual', 'Responsable', 'Creado', 'Primer contacto', 'Seguimientos', 'Último mensaje o acción']];
   lista.forEach(l => filas.push([l.lead_id, kommoLeadUrl(l.lead_id), l.embudo, l.etapa, nombreAgente(l.responsible_user_id), fmtFechaHoraAnio(l.creado_ts), fmtFechaHoraAnio(l.primer_contacto_ts), l.seguimientos, fmtFechaHoraAnio(l.ultimo_mensaje_ts)]));
   const csv = filas.map(f => f.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
